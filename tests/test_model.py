@@ -28,6 +28,7 @@ def test_move_to_cover():
 	m.move(token2, hexes.centre)
 	assert m.tokens[token2] == hexes.centre
 	assert m.tokens[token1] == token2
+	assert m.trapped(token1) == True
 	assert_consistent(m)
 
 def test_cover_then_uncover():
@@ -38,4 +39,16 @@ def test_cover_then_uncover():
 	m.move(token2, hexes.offsets[0])
 	assert m.tokens[token2] == hexes.offsets[0]
 	assert m.tokens[token1] == hexes.centre
+	assert m.trapped(token1) == False
+	assert_consistent(m)
+
+def test_cannot_split_hive():
+	m = model.Model()
+	token1, token2, token3 = random.sample(list(m.tokens), 3)
+	m.move(token1, hexes.centre)
+	m.move(token2, hexes.offsets[0])
+	m.move(token3, hexes.opposite(hexes.offsets[0]))
+	assert m.trapped(token1) == True
+	assert m.trapped(token2) == False
+	assert m.trapped(token3) == False
 	assert_consistent(m)
