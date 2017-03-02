@@ -20,27 +20,38 @@ class Model(object):
     def __init__(self):
         self.tokens = self.initialise_tokens()
 
+        self.reverse = {}
+
     def initialise_tokens(self):
         counter = itertools.count(0)
         return {types.Token(id=next(counter), colour=colour, kind=kind): None
                 for colour in self.colours
                 for kind in self.starting_kinds}
 
-    def token_at(self, hex):
-        return self.hexes_occupied()[hex]
+    def add(self, token, loc):
+        self.tokens[token] = loc
+        assert loc not in self.reverse
+        self.reverse[loc] = token
 
-    def tokens_covering(self):
-        return {loc:token for token,loc in self.tokens.items() if type(loc) == types.Token}
+    def remove(self, token):
+        if self.tokens[token] is not None:
+            del self.reverse[self.tokens[token]]
+        self.tokens[token] = None
 
-    def hexes_occupied(self):
-        return {loc:token for token,loc in self.tokens.items() if type(loc) == tuple}
+    def update(self, token, loc):
+        self.remove(token)
+        self.add(token, loc)
 
     def move(self,token, destination):
-        if token in self.tokens_covering():
-            self.tokens[self.tokens_covering()[token]] = self.tokens[token]
-        if destination in self.hexes_occupied():
-            self.tokens[self.token_at(destination)] = token
-        self.tokens[token] = destination
+        source = self.tokens[token]
+        self.remove(token)
+
+        if token in self.reverse:
+            self.update(self.reverse[token], source)
+        if destination in self.reverse:
+            self.update(self.reverse[destination], token)
+
+        self.add(token, destination)
 
     def __str__(self):
         return '\n'.join("%s: %s" % (token, self.tokens[token]) for token in sorted(self.tokens,key=lambda token: token.id))

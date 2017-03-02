@@ -4,11 +4,9 @@ import random
 
 def assert_consistent(m):
 	for token, loc in m.tokens.items():
-		if type(loc) == types.Token:
-			assert token in m.tokens_covering().values()
-		elif type(loc) == tuple:
-			assert loc in m.hexes_occupied()
-			assert m.token_at(loc) == token
+		if loc is not None:
+			print(token, loc)
+			assert m.reverse[loc] == token
 
 def test_can_create():
 	assert model.Model() is not None
