@@ -25,16 +25,27 @@ class Model(object):
         # Must remain consistent with self.tokens
         self.reverse = {}
         self.cut_tokens = set()
+        self.tokens_on_board = set()
+        self.player_tokens = {colour:set(token for token in self.tokens if token.colour == colour) for colour in self.colours}
 
     def assert_consistent(self):
         for token, loc in self.tokens.items():
             if loc is not None:
                 assert self.reverse[loc] == token
+            if type(loc) == tuple:
+                assert token in self.tokens_on_board
+            assert token in self.player_tokens[token.colour]
+
         for loc, token in self.reverse.items():
             assert self.tokens[token] == loc
         for token in self.cut_tokens:
             assert token in self.tokens
             assert type(self.tokens[token]) == tuple
+        for token in self.tokens_on_board:
+            assert type(self.tokens[token]) == tuple
+        for colour in self.colours:
+            for token in self.player_tokens[colour]:
+                assert token in self.tokens
 
     def initialise_tokens(self):
         counter = itertools.count(0)
@@ -43,13 +54,21 @@ class Model(object):
                 for kind in self.starting_kinds}
 
     def add(self, token, loc):
+        # When adding, update canonical data first
         self.tokens[token] = loc
+
         assert loc not in self.reverse
         self.reverse[loc] = token
+        if type(loc) == tuple:
+            self.tokens_on_board.add(token)
 
     def remove(self, token):
         if self.tokens[token] is not None:
+            if token in self.tokens_on_board:
+                self.tokens_on_board.remove(token)
             del self.reverse[self.tokens[token]]
+
+        # When removing, update canonical data last
         self.tokens[token] = None
 
     def update(self, token, loc):
@@ -106,9 +125,22 @@ class Model(object):
     def trapped(self, token):
         return type(self.tokens[token]) == types.Token or token in self.cut_tokens
 
+    def opponent(self, colour):
+        opponents = {self.white: self.black,
+                     self.black: self.white}
+        return opponents[colour]
+
+    def places(self, colour):
+        colour_neighbours = {colour:set() for colour in self.colours}
+        for c in self.colours:
+            for token in self.tokens_on_board & self.player_tokens[c]:
+                colour_neighbours[c].update(hexes.neighbours(self.tokens[token]))
+        return colour_neighbours[colour] - colour_neighbours[self.opponent(colour)] - set(self.tokens[token] for token in self.tokens_on_board)
+
     def __str__(self):
         return '\n'.join("%s: %s" % (token, self.tokens[token]) for token in sorted(self.tokens,key=lambda token: token.id))
 
 if __name__ == '__main__':
     m = Model()
-    print(m)
+    for colour, tokens in m.player_tokens.items():
+        print(colour, tokens)

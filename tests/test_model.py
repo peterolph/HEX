@@ -45,3 +45,14 @@ def test_cannot_split_hive(m):
 	assert m.trapped(token1) == True
 	assert m.trapped(token2) == False
 	assert m.trapped(token3) == False
+
+def test_places(m):
+	token_black = random.choice(list(m.player_tokens[m.black]))
+	token_white1, token_white2 = random.sample(list(m.player_tokens[m.white]), 2)
+	assert m.places(m.white) == m.places(m.black) == set()
+	m.move(token_black, hexes.centre)
+	assert m.places(m.white) == set()
+	assert m.places(m.black) == set(hexes.offsets)
+	m.move(token_white1, hexes.offsets[0])
+	m.move(token_white2, hexes.opposite(hexes.offsets[0]))
+	assert m.places(m.black) == set()
