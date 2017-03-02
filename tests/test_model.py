@@ -6,13 +6,8 @@ import pytest
 @pytest.fixture(autouse=True)
 def m():
 	m = model.Model()
-
 	yield m
-
-	for token, loc in m.tokens.items():
-		if loc is not None:
-			print(token, loc)
-			assert m.reverse[loc] == token
+	m.assert_consistent()
 
 def test_can_create():
 	assert model.Model() is not None

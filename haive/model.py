@@ -18,10 +18,23 @@ class Model(object):
     starting_kinds = (bee, hopper, hopper, hopper, ant, ant, ant, beetle, beetle, spider, spider)
 
     def __init__(self):
+        # Canonical data
         self.tokens = self.initialise_tokens()
 
+        # Reference collections maintained for performance
+        # Must remain consistent with self.tokens
         self.reverse = {}
         self.cut_tokens = set()
+
+    def assert_consistent(self):
+        for token, loc in self.tokens.items():
+            if loc is not None:
+                assert self.reverse[loc] == token
+        for loc, token in self.reverse.items():
+            assert self.tokens[token] == loc
+        for token in self.cut_tokens:
+            assert token in self.tokens
+            assert type(self.tokens[token]) == tuple
 
     def initialise_tokens(self):
         counter = itertools.count(0)
@@ -45,14 +58,14 @@ class Model(object):
 
     def move(self,token, destination):
         source = self.tokens[token]
-        self.remove(token)
 
+        self.remove(token)
         if token in self.reverse:
             self.update(self.reverse[token], source)
         if destination in self.reverse:
             self.update(self.reverse[destination], token)
-
         self.add(token, destination)
+
         self.update_cut_tokens()
 
     def occupied_neighbour_hexes(self, hex):
