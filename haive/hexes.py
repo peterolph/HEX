@@ -1,14 +1,14 @@
 
 # all the distance 1 offsets around a hexagon
 # in clockwise order starting from the top
-centre = (0,0)
-offsets = ((0,-1), (1,-1), (1,0), (0,1), (-1,1), (-1,0))
+centre = (0,0,0)
+offsets = ((0,-1,0), (1,-1,0), (1,0,0), (0,1,0), (-1,1,0), (-1,0,0))
 
 def add(hex1,hex2):
-    return (hex1[0]+hex2[0], hex1[1]+hex2[1])
+    return (hex1[0]+hex2[0], hex1[1]+hex2[1], hex1[2]+hex2[2])
 
 def sub(hex1,hex2):
-    return (hex1[0]-hex2[0], hex1[1]-hex2[1])
+    return (hex1[0]-hex2[0], hex1[1]-hex2[1], hex1[2]-hex2[2])
 
 # rotate left is anti-clockwise, right is clockwise
 

@@ -8,10 +8,10 @@ def rotate_n_times(offset,dir,n):
 	return offset
 
 def test_add():
-	assert hexes.add((1,2),(3,4)) == (4,6)
+	assert hexes.add((1,2,3),(4,5,6)) == (5,7,9)
 
 def test_sub():
-	assert hexes.sub((1,2),(3,4)) == (-2,-2)
+	assert hexes.sub((1,2,3),(4,5,6)) == (-3,-3,-3)
 
 def test_opposite():
 	for offset in hexes.offsets:
