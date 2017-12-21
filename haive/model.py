@@ -77,23 +77,37 @@ class Model(object):
             depth_first_search(active_hexes[0])
         return set(hex for hex in cut_hexes if cut_hexes[hex] == False)
 
+    # Find the destinations a bee could move to from a given source
+    # Conditions:
+    #   one step away along a grid axis
+    #   not already occupied
+    #   two hexes are adjacent to source and destination, exactly one must be occupied
+    def bee_destinations(self, hex):
+        neighbours = [hexes.add(hex,offset) for offset in hexes.offsets]
+        occupied = [neighbour in self.state for neighbour in neighbours]
+        valid_directions = [(not occupied[i] and (occupied[(i+1)%6] != occupied[(i-1)%6])) for i in range(6)]
+        return set(neighbours[i] for i in range(6) if valid_directions[i])
+
     # Get the opposite colour
     def colour_opposite(self, colour):
         return {white:black, black:white}[colour]
 
-    # Get the hexes occupied by tokens of a certain colour.
+    # Get the hexes occupied by tokens of a given colour.
     def colour_hexes(self, colour):
         return set(hex for hex in self.active_hexes() if self.state[hex].colour == colour)
 
-    # Get hexes neighbouring tokens of a certain colour.
+    # Get hexes neighbouring tokens of a given colour.
     def colour_neighbours(self, colour):
         return hexes.merge(hexes.neighbours(hex) for hex in self.colour_hexes(colour))
 
-    # Find the hexes that are valid for a new token of a certain colour.
-    # These are the ones which touch another token of the same colour and are not already occupied.
-    # Two special cases:
-    #   The first token does not need to touch anything.
-    #   The second token can touch the first, regardless of colour.
+    # Find the hexes that are valid for a new token of a given colour.
+    # Conditions:
+    #   adjacent to a token of the same colour
+    #   not adjacent to any tokens of the opposite colour
+    #   not already occupied
+    # Special cases:
+    #   the first token does not need to touch anything
+    #   the second token can touch the first, regardless of colour
     def places(self, colour):
         if len(self.state) == 0:
             return set(hexes.centre,)
