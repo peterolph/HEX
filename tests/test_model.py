@@ -12,6 +12,12 @@ def m():
 lookup_colour = {colour[0]: colour for colour in model.colours}
 lookup_kind = {kind[0]: kind for kind in model.kinds}
 
+# Add a number of tokens using a simple language.
+# 'wB bb wh' generates a white bee, a black beetle and a white hopper
+#   with the white beetle at the centre of the board.
+# The output can then be repeated in a circle around the centre
+#   with a given step between repetitions.
+# '-' can be used to specify an empty space.
 def add_tokens(m, string, step=6):
     tokens = string.split()
     for factor, token in enumerate(tokens):
