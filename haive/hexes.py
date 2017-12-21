@@ -1,6 +1,7 @@
 
 # This is an implementation of a flat-topped axial hexagonal coordinate grid.
 # Thanks due to https://www.redblobgames.com
+# A single hex is a 3-tuple, a group of hexes is a set
 
 centre = (0,0,0)
 
@@ -36,6 +37,9 @@ def opposite(offset):
 
 def neighbours(hex):
     return set(add(hex,offset) for offset in offsets)
+
+def merge(sets_of_hexes):
+    return set().union(*sets_of_hexes)
 
 def save(hex):
     return "%d,%d,%d" % hex

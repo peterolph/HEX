@@ -9,9 +9,11 @@ def m():
 	yield m
 	m.assert_consistent()
 
-def add_token(m,loc):
-	colour = random.choice(model.colours)
-	kind = random.choice(model.kinds)
+def add_token(m,loc, colour=None, kind=None):
+	if not colour:
+		colour = random.choice(model.colours)
+	if not kind:
+		kind = random.choice(model.kinds)
 	m.state[loc] = model.Token(colour, kind)
 
 def test_create(m):
@@ -38,7 +40,7 @@ def test_neighbours_some(m):
 		add_token(m, offset)
 	assert len(m.neighbours(hexes.centre)) == 4
 
-def test_move_source_empty(m):
+def test_move_sources_empty(m):
 	assert len(m.move_sources()) == 0
 
 def test_move_sources_one(m):
@@ -70,3 +72,31 @@ def test_move_sources_loop(m):
 		add_token(m, offset)
 	assert len(m.state) == 6
 	assert len(m.move_sources()) == 6
+
+def test_places_empty(m):
+	assert len(m.places(model.white)) == 1
+	assert len(m.places(model.black)) == 1
+
+def test_places_single(m):
+	add_token(m, hexes.centre, model.white)
+	assert len(m.places(model.white)) == 6
+	assert len(m.places(model.black)) == 6
+
+def test_places_pair(m):
+	add_token(m, hexes.centre, model.white)
+	add_token(m, hexes.offsets[0], model.black)
+	assert len(m.places(model.white)) == 3
+	assert len(m.places(model.black)) == 3
+
+def test_places_line(m):
+	add_token(m, hexes.centre, model.white)
+	add_token(m, hexes.offsets[0], model.black)
+	add_token(m, hexes.opposite(hexes.offsets[0]), model.black)
+	assert len(m.places(model.white)) == 0
+	assert len(m.places(model.black)) == 6
+
+def test_places_dont_intersect(m):
+	add_token(m, hexes.centre, model.black)
+	add_token(m, hexes.offsets[0], model.black)
+	assert len(m.places(model.white)) == 0
+	assert len(m.places(model.black)) == 8

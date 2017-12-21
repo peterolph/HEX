@@ -43,7 +43,7 @@ class Model(object):
     def neighbours(self, hex):
         return hexes.neighbours(hex) & self.active_hexes()
 
-    # Find which hexes can have tokens moved out of them without splitting the hive.
+    # Find the hexes that can have tokens moved out of them without splitting the hive.
     # Imagine the board as a graph and use Tarjan's algorithm to find the hexes that are NOT cut vertices.
     # https://en.wikipedia.org/wiki/Biconnected_component
     def move_sources(self):
@@ -76,3 +76,28 @@ class Model(object):
         if len(active_hexes) > 0:
             depth_first_search(active_hexes[0])
         return set(hex for hex in cut_hexes if cut_hexes[hex] == False)
+
+    # Get the opposite colour
+    def colour_opposite(self, colour):
+        return {white:black, black:white}[colour]
+
+    # Get the hexes occupied by tokens of a certain colour.
+    def colour_hexes(self, colour):
+        return set(hex for hex in self.active_hexes() if self.state[hex].colour == colour)
+
+    # Get hexes neighbouring tokens of a certain colour.
+    def colour_neighbours(self, colour):
+        return hexes.merge(hexes.neighbours(hex) for hex in self.colour_hexes(colour))
+
+    # Find the hexes that are valid for a new token of a certain colour.
+    # These are the ones which touch another token of the same colour and are not already occupied.
+    # Two special cases:
+    #   The first token does not need to touch anything.
+    #   The second token can touch the first, regardless of colour.
+    def places(self, colour):
+        if len(self.state) == 0:
+            return set(hexes.centre,)
+        elif len(self.state) == 1:
+            return hexes.neighbours(hexes.centre)
+        else:
+            return self.colour_neighbours(colour) - self.colour_neighbours(self.colour_opposite(colour)) - set(self.state)
