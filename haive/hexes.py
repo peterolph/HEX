@@ -29,3 +29,9 @@ def opposite(offset):
 
 def neighbours(hex):
     return set(add(hex,offset) for offset in offsets)
+
+def save(hex):
+    return "%d,%d,%d" % hex
+
+def load(string):
+    return tuple(int(c) for c in string.split(','))
