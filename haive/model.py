@@ -1,7 +1,8 @@
 
-import itertools
-
+from collections import namedtuple
 from haive import hexes
+
+Token = namedtuple('Token', ['colour', 'kind'])
 
 white = 'white'
 black = 'black'
@@ -29,4 +30,4 @@ class Model(object):
     def load(self, state):
         for item in state.split('|'):
             loc, colour, kind = item.split(':')
-            self.state[hexes.load(loc)] = (colour, kind)
+            self.state[hexes.load(loc)] = Token(colour, kind)
