@@ -9,13 +9,10 @@ def m():
 	yield m
 	m.assert_consistent()
 
-def gen_token():
-	loc = hexes.centre
-	for _ in range(10):
-		loc = hexes.add(loc,random.choice(hexes.offsets))
+def add_token(m,loc):
 	colour = random.choice(model.colours)
 	kind = random.choice(model.kinds)
-	return {loc: model.Token(colour, kind)}
+	m.state[loc] = model.Token(colour, kind)
 
 def test_create(m):
 	assert m is not None
@@ -24,13 +21,52 @@ def test_save_empty(m):
 	assert m.save() is not None
 
 def test_save_nonempty(m):
-	m.state.update(gen_token())
+	add_token(m, hexes.centre)
 	assert m.save() is not None
 
 def test_save_multiple(m):
-	m.state.update(gen_token())
-	m.state.update(gen_token())
-	m.state.update(gen_token())
+	add_token(m, hexes.centre)
+	add_token(m, hexes.offsets[0])
+	add_token(m, hexes.offsets[1])
 	assert m.save() is not None
 
+def test_neighbours_none(m):
+	assert len(m.neighbours(hexes.centre)) == 0
 
+def test_neighbours_some(m):
+	for offset in random.sample(hexes.offsets, 4):
+		add_token(m, offset)
+	assert len(m.neighbours(hexes.centre)) == 4
+
+def test_move_source_empty(m):
+	assert len(m.move_sources()) == 0
+
+def test_move_sources_one(m):
+	add_token(m, hexes.centre)
+	assert len(m.move_sources()) == 1
+
+def test_move_sources_two(m):
+	add_token(m, hexes.centre)
+	add_token(m, hexes.offsets[0])
+	assert len(m.move_sources()) == 2
+
+def test_move_sources_line(m):
+	add_token(m, hexes.centre)
+	for i in range(1,8):
+		add_token(m, hexes.mul(hexes.offsets[0], i))
+	assert len(m.state) == 1 + 7
+	assert len(m.move_sources()) == 2
+
+def test_move_sources_star(m):
+	add_token(m, hexes.centre)
+	for i in range(1,8):
+		for offset in hexes.offsets[::2]:
+			add_token(m, hexes.mul(offset, i))
+	assert len(m.state) == 1 + 3*7
+	assert len(m.move_sources()) == 3
+
+def test_move_sources_loop(m):
+	for offset in hexes.offsets:
+		add_token(m, offset)
+	assert len(m.state) == 6
+	assert len(m.move_sources()) == 6
