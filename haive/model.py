@@ -1,100 +1,56 @@
 
-import itertools
+# This is a model of a Hive game.
+# It stores the current position of tokens in play and supplies available moves for both players.
 
-from haive import hexes, types
+from collections import namedtuple
+from haive import hexes
+
+Token = namedtuple('Token', ['colour', 'kind'])
+
+white = 'white'
+black = 'black'
+colours = (white, black)
+
+bee = 'Bee'
+hopper = 'hopper'
+ant = 'ant'
+beetle = 'beetle'
+spider = 'spider'
+kinds = (bee, hopper, ant, beetle, spider)
+hand = (bee, hopper, hopper, hopper, ant, ant, ant, beetle, beetle, spider, spider)
 
 class Model(object):
 
-    white = 'white'
-    black = 'black'
-    colours = (white, black)
-
-    bee = 'Bee'
-    hopper = 'hopper'
-    ant = 'ant'
-    beetle = 'beetle'
-    spider = 'spider'
-    kinds = (bee, hopper, ant, beetle, spider)
-    starting_kinds = (bee, hopper, hopper, hopper, ant, ant, ant, beetle, beetle, spider, spider)
-
     def __init__(self):
-        # Canonical data
-        self.tokens = self.initialise_tokens()
-
-        # Reference collections maintained for performance
-        # Must remain consistent with self.tokens
-        self.reverse = {}
-        self.cut_tokens = set()
-        self.tokens_on_board = set()
-        self.player_tokens = {colour:set(token for token in self.tokens if token.colour == colour) for colour in self.colours}
+        self.state = {}
 
     def assert_consistent(self):
-        for token, loc in self.tokens.items():
-            if loc is not None:
-                assert self.reverse[loc] == token
-            if type(loc) == tuple:
-                assert token in self.tokens_on_board
-            assert token in self.player_tokens[token.colour]
+        return True
 
-        for loc, token in self.reverse.items():
-            assert self.tokens[token] == loc
-        for token in self.cut_tokens:
-            assert token in self.tokens
-            assert type(self.tokens[token]) == tuple
-        for token in self.tokens_on_board:
-            assert type(self.tokens[token]) == tuple
-        for colour in self.colours:
-            for token in self.player_tokens[colour]:
-                assert token in self.tokens
+    def save(self):
+        return '|'.join(':'.join((hexes.save(loc),*self.state[loc])) for loc in sorted(self.state.keys()))
 
-    def initialise_tokens(self):
-        counter = itertools.count(0)
-        return {types.Token(id=next(counter), colour=colour, kind=kind): None
-                for colour in self.colours
-                for kind in self.starting_kinds}
+    def load(self, state):
+        for item in state.split('|'):
+            loc, colour, kind = item.split(':')
+            self.state[hexes.load(loc)] = Token(colour, kind)
 
-    def add(self, token, loc):
-        # When adding, update canonical data first
-        self.tokens[token] = loc
+    # Get the hexes on the top of the hive ie. not covered by another hex.
+    def active_hexes(self):
+        return set(hex for hex in self.state.keys() if hex[2] == 0)
 
-        assert loc not in self.reverse
-        self.reverse[loc] = token
-        if type(loc) == tuple:
-            self.tokens_on_board.add(token)
+    # Get the occupied hexes which neighbour this one.
+    def neighbours(self, hex):
+        return hexes.neighbours(hex) & self.active_hexes()
 
-    def remove(self, token):
-        if self.tokens[token] is not None:
-            if token in self.tokens_on_board:
-                self.tokens_on_board.remove(token)
-            del self.reverse[self.tokens[token]]
-
-        # When removing, update canonical data last
-        self.tokens[token] = None
-
-    def update(self, token, loc):
-        self.remove(token)
-        self.add(token, loc)
-
-    def move(self,token, destination):
-        source = self.tokens[token]
-
-        self.remove(token)
-        if token in self.reverse:
-            self.update(self.reverse[token], source)
-        if destination in self.reverse:
-            self.update(self.reverse[destination], token)
-        self.add(token, destination)
-
-        self.update_cut_tokens()
-
-    def occupied_neighbour_hexes(self, hex):
-        return set(neighbour for neighbour in hexes.neighbours(hex) if neighbour in self.reverse)
-
-    def update_cut_tokens(self):
-        active_hexes = list(self.tokens[token] for token in self.tokens if type(self.tokens[token]) == tuple)
+    # Find the hexes that can have tokens moved out of them without splitting the hive.
+    # Imagine the board as a graph and use Tarjan's algorithm to find the hexes that are NOT cut vertices.
+    # https://en.wikipedia.org/wiki/Biconnected_component
+    def move_sources(self):
+        active_hexes = list(self.active_hexes())
 
         discovery = {hex:0 for hex in active_hexes}
-        low = {hex:1000 for hex in active_hexes}
+        low = {hex:9999 for hex in active_hexes}
         visited = {hex:False for hex in active_hexes}
         parent = {hex:None for hex in active_hexes}
 
@@ -104,7 +60,7 @@ class Model(object):
             visited[hex] = True
             discovery[hex] = low[hex] = depth
             child_count = 0
-            for neighbour in self.occupied_neighbour_hexes(hex):
+            for neighbour in self.neighbours(hex):
                 if visited[neighbour] == False:
                     child_count += 1
                     parent[neighbour] = hex
@@ -117,30 +73,45 @@ class Model(object):
                 elif parent[hex] != neighbour:
                     low[hex] = min(low[hex], discovery[neighbour])
 
-        depth_first_search(active_hexes[0])
-        self.cut_tokens = set([self.reverse[hex]
-                               for hex in cut_hexes
-                               if cut_hexes[hex] == True])
+        if len(active_hexes) > 0:
+            depth_first_search(active_hexes[0])
+        return set(hex for hex in cut_hexes if cut_hexes[hex] == False)
 
-    def trapped(self, token):
-        return type(self.tokens[token]) == types.Token or token in self.cut_tokens
+    # Find the destinations a bee could move to from a given source
+    # Conditions:
+    #   one step away along a grid axis
+    #   not already occupied
+    #   two hexes are adjacent to source and destination, exactly one must be occupied
+    def bee_destinations(self, hex):
+        neighbours = [hexes.add(hex,offset) for offset in hexes.offsets]
+        occupied = [neighbour in self.state for neighbour in neighbours]
+        valid_directions = [(not occupied[i] and (occupied[(i+1)%6] != occupied[(i-1)%6])) for i in range(6)]
+        return set(neighbours[i] for i in range(6) if valid_directions[i])
 
-    def opponent(self, colour):
-        opponents = {self.white: self.black,
-                     self.black: self.white}
-        return opponents[colour]
+    # Get the opposite colour
+    def colour_opposite(self, colour):
+        return {white:black, black:white}[colour]
 
+    # Get the hexes occupied by tokens of a given colour.
+    def colour_hexes(self, colour):
+        return set(hex for hex in self.active_hexes() if self.state[hex].colour == colour)
+
+    # Get hexes neighbouring tokens of a given colour.
+    def colour_neighbours(self, colour):
+        return hexes.merge(hexes.neighbours(hex) for hex in self.colour_hexes(colour))
+
+    # Find the hexes that are valid for a new token of a given colour.
+    # Conditions:
+    #   adjacent to a token of the same colour
+    #   not adjacent to any tokens of the opposite colour
+    #   not already occupied
+    # Special cases:
+    #   the first token does not need to touch anything
+    #   the second token can touch the first, regardless of colour
     def places(self, colour):
-        colour_neighbours = {colour:set() for colour in self.colours}
-        for c in self.colours:
-            for token in self.tokens_on_board & self.player_tokens[c]:
-                colour_neighbours[c].update(hexes.neighbours(self.tokens[token]))
-        return colour_neighbours[colour] - colour_neighbours[self.opponent(colour)] - set(self.tokens[token] for token in self.tokens_on_board)
-
-    def __str__(self):
-        return '\n'.join("%s: %s" % (token, self.tokens[token]) for token in sorted(self.tokens,key=lambda token: token.id))
-
-if __name__ == '__main__':
-    m = Model()
-    for colour, tokens in m.player_tokens.items():
-        print(colour, tokens)
+        if len(self.state) == 0:
+            return set(hexes.centre,)
+        elif len(self.state) == 1:
+            return hexes.neighbours(hexes.centre)
+        else:
+            return self.colour_neighbours(colour) - self.colour_neighbours(self.colour_opposite(colour)) - set(self.state)
