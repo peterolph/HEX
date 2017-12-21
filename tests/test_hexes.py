@@ -46,4 +46,6 @@ def test_neighbours():
 
 def test_merge():
 	some_hexes = hexes.neighbours((9,2,4))
+	assert hexes.merge(()) == set()
+	assert hexes.merge((some_hexes,)) == some_hexes
 	assert hexes.merge((some_hexes, some_hexes)) == some_hexes
