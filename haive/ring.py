@@ -8,10 +8,15 @@ class Ring(tuple):
     def __getitem__(self, key):
         length = len(self)
         if isinstance(key, slice):
-            if key.stop - key.start > length:
+            start, stop = key.start, key.stop
+            if start is None:
+                start = 0
+            if stop is None:
+                stop = length
+            if stop - start > length:
                 raise IndexError
-            start = key.start % length
-            stop = key.stop % length
+            start %= length
+            stop %= length
             if start >= stop:
                 return (self+self)[slice(start,stop+length,key.step)]
             else:

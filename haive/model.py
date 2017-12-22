@@ -3,7 +3,7 @@
 # It stores the current position of tokens in play and supplies available moves for both players.
 
 from collections import namedtuple
-from haive import hexes
+from haive import hexes, ring
 
 Token = namedtuple('Token', ['colour', 'kind'])
 
@@ -83,9 +83,9 @@ class Model(object):
     #   not already occupied
     #   two hexes are adjacent to source and destination, exactly one must be occupied
     def bee_destinations(self, hex):
-        neighbours = [hexes.add(hex,offset) for offset in hexes.offsets]
-        occupied = [neighbour in self.state for neighbour in neighbours]
-        valid_directions = [(not occupied[i] and (occupied[(i+1)%6] != occupied[(i-1)%6])) for i in range(6)]
+        neighbours = ring.Ring(hexes.add(hex,offset) for offset in hexes.offsets)
+        occupied = ring.Ring(neighbour in self.state for neighbour in neighbours)
+        valid_directions = [(not occupied[i] and (occupied[i+1] != occupied[i-1])) for i in range(6)]
         return set(neighbours[i] for i in range(6) if valid_directions[i])
 
     # Get the opposite colour
