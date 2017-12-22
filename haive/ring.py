@@ -1,7 +1,7 @@
 
 # An extension of `list` that loops indices.
 
-class Ring(list):
+class Ring(tuple):
     def _getsuper(self, key):
         return super().__getitem__(key)
 
