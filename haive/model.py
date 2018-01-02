@@ -43,6 +43,16 @@ class Model(object):
     def occupied_neighbours(self, hex):
         return hexes.neighbours(hex) & self.active_hexes()
 
+    # Get the unoccupied hexes which neighbour this one.
+    def unoccupied_neighbours(self, hex):
+        return hexes.neighbours(hex) - self.active_hexes()
+
+    # Get the unoccupied hexes which neighbour this one but no others
+    def unique_unoccupied_neighbours(self, hex):
+        assert hex in self.state
+        return set(neighbour for neighbour in self.unoccupied_neighbours(hex)
+            if len(self.occupied_neighbours(neighbour)) == 1)
+
     # Find the hexes that can have tokens moved out of them without splitting the hive.
     # Imagine the board as a graph and use Tarjan's algorithm to find the hexes that are NOT cut vertices.
     # https://en.wikipedia.org/wiki/Biconnected_component

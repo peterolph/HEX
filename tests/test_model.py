@@ -50,6 +50,29 @@ def test_occupied_neighbours_some(m):
     add_tokens(m, 'wB wa', step=2)
     assert len(m.occupied_neighbours(hexes.centre)) == 3
 
+def test_unoccupied_neighbours_none(m):
+	assert len(m.unoccupied_neighbours(hexes.centre)) == 6
+
+def test_unoccupied_neighbours_some(m):
+    add_tokens(m, 'wB wa', step=2)
+    assert len(m.occupied_neighbours(hexes.centre)) == 3
+
+def test_unique_unoccupied_neighbours_one(m):
+	add_tokens(m, 'wB')
+	assert(len(m.unique_unoccupied_neighbours(hexes.centre))) == 6
+
+def test_unique_unoccupied_neighbours_two(m):
+	add_tokens(m, 'wB wa')
+	assert(len(m.unique_unoccupied_neighbours(hexes.centre))) == 3
+
+def test_unique_unoccupied_neighbours_line(m):
+	add_tokens(m, 'wB wa', step=3)
+	assert(len(m.unique_unoccupied_neighbours(hexes.centre))) == 0
+
+def test_unique_unoccupied_neighbours_curved_line(m):
+	add_tokens(m, 'wB wa', step=4)
+	assert(len(m.unique_unoccupied_neighbours(hexes.centre))) == 1
+
 def test_move_sources_empty(m):
     assert len(m.move_sources()) == 0
 
