@@ -118,6 +118,15 @@ class Model(object):
     def bee_moves(self, hex):
         return hexes.merge(self.crawl_moves(hex))
 
+    def spider_moves(self, hex):
+        spider_moves = self.crawl_moves(hex)
+        graph = self.crawl_graph()
+        for _ in range(2):
+            spider_moves = Node(
+                left=hexes.merge(graph[hex].left for hex in spider_moves.left),
+                right=hexes.merge(graph[hex].right for hex in spider_moves.right))
+        return hexes.merge(spider_moves)
+
     # Get the opposite colour
     def colour_opposite(self, colour):
         return {white:black, black:white}[colour]
