@@ -43,12 +43,12 @@ def test_save_multiple(m):
     add_tokens(m, 'bb wB bh')
     assert m.save() is not None
 
-def test_neighbours_none(m):
-    assert len(m.neighbours(hexes.centre)) == 0
+def test_occupied_neighbours_none(m):
+    assert len(m.occupied_neighbours(hexes.centre)) == 0
 
-def test_neighbours_some(m):
+def test_occupied_neighbours_some(m):
     add_tokens(m, 'wB wa', step=2)
-    assert len(m.neighbours(hexes.centre)) == 3
+    assert len(m.occupied_neighbours(hexes.centre)) == 3
 
 def test_move_sources_empty(m):
     assert len(m.move_sources()) == 0

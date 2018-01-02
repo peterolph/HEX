@@ -40,7 +40,7 @@ class Model(object):
         return set(hex for hex in self.state.keys() if hex[2] == 0)
 
     # Get the occupied hexes which neighbour this one.
-    def neighbours(self, hex):
+    def occupied_neighbours(self, hex):
         return hexes.neighbours(hex) & self.active_hexes()
 
     # Find the hexes that can have tokens moved out of them without splitting the hive.
@@ -60,7 +60,7 @@ class Model(object):
             visited[hex] = True
             discovery[hex] = low[hex] = depth
             child_count = 0
-            for neighbour in self.neighbours(hex):
+            for neighbour in self.occupied_neighbours(hex):
                 if visited[neighbour] == False:
                     child_count += 1
                     parent[neighbour] = hex
