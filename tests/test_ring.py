@@ -13,8 +13,16 @@ def test_keys(r):
 
 def test_ranges(r):
     for i in range(-len(r),len(r)):
-        for j in range(i+1,i+len(r)+1):
+        for j in range(max(0,i),i+len(r)+1):
             result = r[i:j]
             assert len(result) == j-i
-            assert result[0] == i % len(r)
-            assert result[-1] == (j-1) % len(r)
+            if len(result) > 0:
+                assert result[0] == i % len(r)
+                assert result[-1] == (j-1) % len(r)
+
+def test_ranges_with_steps(r):
+    for i in range(-len(r),len(r)):
+        for j in range(max(0,i),i+len(r)+1):
+            for step in range(1,len(r)):
+                result = r[i:j:step]
+                assert len(result) == ((j-i-1) // step) + 1
