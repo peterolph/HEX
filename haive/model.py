@@ -115,16 +115,8 @@ class Model(object):
                     open_set.add(hex)
         return graph
 
-    # Find the destinations a bee could move to from a given source
-    # Conditions:
-    #   one step away along a grid axis
-    #   not already occupied
-    #   two hexes are adjacent to source and destination, exactly one must be occupied
-    def bee_destinations(self, hex):
-        neighbours = ring.Ring(hexes.add(hex,offset) for offset in hexes.offsets)
-        occupied = ring.Ring(neighbour in self.state for neighbour in neighbours)
-        valid_directions = [(not occupied[i] and (occupied[i+1] != occupied[i-1])) for i in range(6)]
-        return set(neighbours[i] for i in range(6) if valid_directions[i])
+    def bee_moves(self, hex):
+        return hexes.merge(self.crawl_moves(hex))
 
     # Get the opposite colour
     def colour_opposite(self, colour):

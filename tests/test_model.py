@@ -123,21 +123,21 @@ def test_places_dont_intersect(m):
     assert len(m.places(model.white)) == 0
     assert len(m.places(model.black)) == 8
 
-def test_bee_destinations_end(m):
+def test_bee_moves_end(m):
     add_tokens(m, 'wB wa wa wa')
-    assert len(m.bee_destinations(hexes.centre)) == 2
+    assert len(m.bee_moves(hexes.centre)) == 2
 
-def test_bee_destinations_middle(m):
+def test_bee_moves_middle(m):
     add_tokens(m, 'wB wa wa wa', step=3)
-    assert len(m.bee_destinations(hexes.centre)) == 4
+    assert len(m.bee_moves(hexes.centre)) == 4
 
-def test_bee_destinations_star(m):
+def test_bee_moves_star(m):
     add_tokens(m, 'wB wa wa wa', step=2)
-    assert len(m.bee_destinations(hexes.centre)) == 0
+    assert len(m.bee_moves(hexes.centre)) == 0
 
-def test_bee_destinations_trapped(m):
+def test_bee_moves_trapped(m):
     add_tokens(m, 'wB wa wa wa', step=1)
-    assert len(m.bee_destinations(hexes.centre)) == 0
+    assert len(m.bee_moves(hexes.centre)) == 0
 
 def crawl_graph_assertions(graph):
     for hex, node in graph.items():
