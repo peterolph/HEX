@@ -199,12 +199,27 @@ def test_spider_moves_middle(m):
     left, right = m.spider_moves(hexes.centre)
     assert hexes.add(left, right) == hexes.centre
 
+def test_ant_moves_end(m):
+    add_tokens(m, 'wa bh bh bh')
+    assert len(m.ant_moves(hexes.centre)) == 9
+
+def test_ant_moves_middle(m):
+    add_tokens(m, 'wa bh bh', step=3)
+    assert len(m.ant_moves(hexes.centre)) == 14
+
+def test_ant_moves_loop(m):
+    add_tokens(m, '- bh', step=1)
+    add_tokens(m, '- wa')
+    assert len(m.ant_moves(hexes.offsets[0])) == 11
+
 def test_trapped_moves(m):
     add_tokens(m, 'wB wa', step=1)
     assert len(m.bee_moves(hexes.centre)) == 0
     assert len(m.spider_moves(hexes.centre)) == 0
+    assert len(m.ant_moves(hexes.centre)) == 0
 
 def test_trapped_star_moves(m):
     add_tokens(m, 'wB wa wa wa', step=2)
     assert len(m.bee_moves(hexes.centre)) == 0
     assert len(m.spider_moves(hexes.centre)) == 0
+    assert len(m.ant_moves(hexes.centre)) == 0

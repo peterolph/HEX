@@ -127,6 +127,18 @@ class Model(object):
                 right=hexes.merge(graph[hex].right for hex in spider_moves.right))
         return hexes.merge(spider_moves)
 
+    def ant_moves(self, hex):
+        ant_moves = hexes.merge(self.crawl_moves(hex))
+        open_set = self.crawl_moves(hex).left
+        graph = self.crawl_graph()
+        while len(open_set) > 0:
+            current = open_set.pop()
+            ant_moves.add(current)
+            for hex in graph[current].left:
+                if hex not in ant_moves and hex not in open_set:
+                    open_set.add(hex)
+        return ant_moves
+
     # Get the opposite colour
     def colour_opposite(self, colour):
         return {white:black, black:white}[colour]
