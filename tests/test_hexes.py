@@ -2,9 +2,9 @@
 import functools
 from haive import hexes
 
-def rotate_n_times(offset,dir,n):
+def rotate_n_times(dir,offset,n):
     for _ in range(n):
-        offset = hexes.rotate(offset,dir)
+        offset = hexes.rotate(dir, offset)
     return offset
 
 def sum(set_of_hexes):
@@ -26,15 +26,15 @@ def test_opposite():
 
 def test_rotate():
     for offset in hexes.offsets:
-        assert rotate_n_times(offset,hexes.left,6) == offset
-        assert rotate_n_times(offset,hexes.right,6) == offset
+        assert rotate_n_times(hexes.left,offset,6) == offset
+        assert rotate_n_times(hexes.right,offset,6) == offset
         for n in range(6):
-            assert rotate_n_times(offset,hexes.left,n) == rotate_n_times(offset,hexes.right,6-n)
+            assert rotate_n_times(hexes.left,offset,n) == rotate_n_times(hexes.right,offset,6-n)
 
 def test_rotate_to_opposite():
     for offset in hexes.offsets:
-        assert rotate_n_times(offset,hexes.left,3) == hexes.opposite(offset)
-        assert rotate_n_times(offset,hexes.right,3) == hexes.opposite(offset)
+        assert rotate_n_times(hexes.left,offset,3) == hexes.opposite(offset)
+        assert rotate_n_times(hexes.right,offset,3) == hexes.opposite(offset)
 
 def test_all_offsets():
     assert sum(hexes.offsets) == hexes.centre

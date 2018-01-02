@@ -24,11 +24,14 @@ left_rotations  = {offsets[i]:offsets[i-1] for i in range(6)}
 right_rotations = {offsets[i]:offsets[i+1] for i in range(6)}
 left = 'LEFT'
 right = 'RIGHT'
-def rotate(offset,dir):
+def rotate(dir,hex,pivot=centre):
+    offset = sub(hex,pivot)
+    if offset not in offsets:
+        raise ValueError
     if dir == left:
-        return left_rotations[offset]
+        return add(left_rotations[offset],pivot)
     elif dir == right:
-        return right_rotations[offset]
+        return add(right_rotations[offset],pivot)
     else:
         raise ValueError
 
