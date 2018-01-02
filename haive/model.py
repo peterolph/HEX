@@ -6,6 +6,7 @@ from collections import namedtuple
 from haive import hexes, ring
 
 Token = namedtuple('Token', ['colour', 'kind'])
+Node = namedtuple('Node', ['left', 'right'])
 
 white = 'white'
 black = 'black'
@@ -87,6 +88,33 @@ class Model(object):
             depth_first_search(active_hexes[0])
         return set(hex for hex in cut_hexes if cut_hexes[hex] == False)
 
+    def crawl_moves(self, hex):
+        crawl_moves = Node(set(), set())
+        occupied = self.occupied_neighbours(hex)
+        unoccupied = self.unoccupied_neighbours(hex)
+        for destination in unoccupied:
+            if hexes.rotate(hexes.left, destination, hex) in occupied and hexes.rotate(hexes.right, destination, hex) in unoccupied:
+                crawl_moves.left.add(destination)
+            if hexes.rotate(hexes.right, destination, hex) in occupied and hexes.rotate(hexes.left, destination, hex) in unoccupied:
+                crawl_moves.right.add(destination)
+        return crawl_moves
+
+    def all_crawl_moves(self):
+        return {hex:self.crawl_moves(hex) for hex in self.kind_hexes(bee, ant, spider, beetle)}
+
+    # Build a bidirected graph of the chain(s) of hexes that crawling tokens can reach
+    # The graph may have disconnected components but all nodes are on at least one cycle
+    def crawl_graph(self):
+        graph = {}
+        open_set = hexes.merge(node.left|node.right for node in self.all_crawl_moves().values())
+        while len(open_set) > 0:
+            current = open_set.pop()
+            graph[current] = self.crawl_moves(current)
+            for hex in graph[current].left:
+                if hex not in graph and hex not in open_set:
+                    open_set.add(hex)
+        return graph
+
     # Find the destinations a bee could move to from a given source
     # Conditions:
     #   one step away along a grid axis
@@ -105,6 +133,10 @@ class Model(object):
     # Get the hexes occupied by tokens of a given colour.
     def colour_hexes(self, colour):
         return set(hex for hex in self.active_hexes() if self.state[hex].colour == colour)
+
+    # Get the hexes occupied by tokens of a given kind.
+    def kind_hexes(self, *kinds):
+        return set(hex for hex in self.active_hexes() if self.state[hex].kind in kinds)
 
     # Get hexes neighbouring tokens of a given colour.
     def colour_neighbours(self, colour):

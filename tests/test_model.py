@@ -51,27 +51,27 @@ def test_occupied_neighbours_some(m):
     assert len(m.occupied_neighbours(hexes.centre)) == 3
 
 def test_unoccupied_neighbours_none(m):
-	assert len(m.unoccupied_neighbours(hexes.centre)) == 6
+    assert len(m.unoccupied_neighbours(hexes.centre)) == 6
 
 def test_unoccupied_neighbours_some(m):
     add_tokens(m, 'wB wa', step=2)
     assert len(m.occupied_neighbours(hexes.centre)) == 3
 
 def test_unique_unoccupied_neighbours_one(m):
-	add_tokens(m, 'wB')
-	assert(len(m.unique_unoccupied_neighbours(hexes.centre))) == 6
+    add_tokens(m, 'wB')
+    assert(len(m.unique_unoccupied_neighbours(hexes.centre))) == 6
 
 def test_unique_unoccupied_neighbours_two(m):
-	add_tokens(m, 'wB wa')
-	assert(len(m.unique_unoccupied_neighbours(hexes.centre))) == 3
+    add_tokens(m, 'wB wa')
+    assert(len(m.unique_unoccupied_neighbours(hexes.centre))) == 3
 
 def test_unique_unoccupied_neighbours_line(m):
-	add_tokens(m, 'wB wa', step=3)
-	assert(len(m.unique_unoccupied_neighbours(hexes.centre))) == 0
+    add_tokens(m, 'wB wa', step=3)
+    assert(len(m.unique_unoccupied_neighbours(hexes.centre))) == 0
 
 def test_unique_unoccupied_neighbours_curved_line(m):
-	add_tokens(m, 'wB wa', step=4)
-	assert(len(m.unique_unoccupied_neighbours(hexes.centre))) == 1
+    add_tokens(m, 'wB wa', step=4)
+    assert(len(m.unique_unoccupied_neighbours(hexes.centre))) == 1
 
 def test_move_sources_empty(m):
     assert len(m.move_sources()) == 0
@@ -138,3 +138,60 @@ def test_bee_destinations_star(m):
 def test_bee_destinations_trapped(m):
     add_tokens(m, 'wB wa wa wa', step=1)
     assert len(m.bee_destinations(hexes.centre)) == 0
+
+def crawl_graph_assertions(graph):
+    for hex, node in graph.items():
+        assert len(node.left) > 0
+        assert len(node.right) > 0
+        for dest in node.left | node.right:
+            assert dest in graph
+
+def crawl_graph_loop(graph, start, length):
+    lpos = rpos = start
+    for i in range(length):
+        if i != 0:
+            assert lpos != start
+            assert rpos != start
+        if length%2 == 0 and i == length / 2:
+            assert lpos == rpos
+        lpos = list(graph[lpos].left)[0]
+        rpos = list(graph[rpos].right)[0]
+    assert lpos == start
+    assert rpos == start
+
+def test_crawl_graph(m):
+    add_tokens(m, 'wB wa')
+    result = m.crawl_graph()
+    crawl_graph_assertions(result)
+    assert len(result) == 8
+    crawl_graph_loop(result, list(result)[0], 8)
+
+def test_crawl_graph_disconnected(m):
+    add_tokens(m, 'wB wa - - - - bB ba')
+    result = m.crawl_graph()
+    crawl_graph_assertions(result)
+    assert len(result) == 16
+    crawl_graph_loop(result, list(result)[0], 8)
+
+def test_crawl_graph_forked(m):
+    add_tokens(m, 'wB wa - bB ba')
+    result = m.crawl_graph()
+    crawl_graph_assertions(result)
+    assert len(result) == 15
+    fork_hex = hexes.mul(hexes.offsets[0],2)
+    assert len(result[fork_hex].left) == 2
+    assert len(result[fork_hex].right) == 2
+    assert sum(1 for hex, node in result.items() if fork_hex in node.left | node.right)
+
+def test_crawl_graph_trapped(m):
+    add_tokens(m, 'wB wh', step=1)
+    result = m.crawl_graph()
+    crawl_graph_assertions(result)
+    assert len(result) == 0
+
+def test_crawl_graph_loop(m):
+    add_tokens(m, '- wB', step=1)
+    result = m.crawl_graph()
+    crawl_graph_assertions(result)
+    assert len(result) == 12
+    assert hexes.centre not in result
