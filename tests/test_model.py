@@ -7,7 +7,6 @@ import pytest
 def m():
     m = model.Model()
     yield m
-    m.assert_consistent()
 
 lookup_colour = {colour[0]: colour for colour in model.colours}
 lookup_kind = {kind[0]: kind for kind in model.kinds}

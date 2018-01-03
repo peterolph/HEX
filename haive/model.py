@@ -25,9 +25,6 @@ class Model(object):
     def __init__(self):
         self.state = {}
 
-    def assert_consistent(self):
-        return True
-
     def save(self):
         return '|'.join(':'.join((hexes.save(loc),*self.state[loc])) for loc in sorted(self.state.keys()))
 
