@@ -1,5 +1,5 @@
 
-# This is a model of a Hive game.
+# A model of a Hive game.
 # It stores the current position of tokens in play and supplies available moves for both players.
 
 from collections import namedtuple
@@ -33,7 +33,7 @@ class Model(object):
             loc, colour, kind = item.split(':')
             self.state[hexes.load(loc)] = Token(colour, kind)
 
-    def add(self, hex, token):
+    def add(self, token, hex):
         if hex in self.state:
             self.move(hex, hexes.add(hex, hexes.down))
         self.state[hex] = token
@@ -47,7 +47,7 @@ class Model(object):
 
     def move(self, source, destination):
         token = self.remove(source)
-        self.add(destination, token)
+        self.add(token, destination)
 
     # Get the hexes on the top of the hive ie. not covered by another hex.
     def active_hexes(self):
