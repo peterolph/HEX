@@ -184,10 +184,13 @@ class Model(object):
     # Special cases:
     #   the first token does not need to touch anything
     #   the second token can touch the first, regardless of colour
-    def places(self, colour):
+    def colour_places(self, colour):
         if len(self.state) == 0:
             return set(hexes.centre,)
         elif len(self.state) == 1:
             return hexes.neighbours(hexes.centre)
         else:
             return self.colour_neighbours(colour) - self.colour_neighbours(self.colour_opposite(colour)) - set(self.state)
+
+    def places(self):
+        return {colour: self.colour_places(colour) for colour in colours}

@@ -31,6 +31,8 @@ def add_tokens(m, string, step=6, clear=True):
             for offset in hexes.offsets[::step]:
                 m.state[hexes.mul(offset, factor)] = model.Token(colour, kind)
 
+# BASICS
+
 def test_create(m):
     assert m is not None
 
@@ -75,6 +77,38 @@ def test_unique_unoccupied_neighbours_curved_line(m):
     add_tokens(m, 'wB wa', step=4)
     assert(len(m.unique_unoccupied_neighbours(hexes.centre))) == 1
 
+# PLACES
+
+def test_colour_places_empty(m):
+    assert len(m.colour_places(model.white)) == 1
+    assert len(m.colour_places(model.black)) == 1
+
+def test_colour_places_single(m):
+    add_tokens(m, 'wB')
+    assert len(m.colour_places(model.white)) == 6
+    assert len(m.colour_places(model.black)) == 6
+
+def test_colour_places_pair(m):
+    add_tokens(m, 'wB bB')
+    assert len(m.colour_places(model.white)) == 3
+    assert len(m.colour_places(model.black)) == 3
+
+def test_colour_places_line(m):
+    add_tokens(m, 'bB wB bB')
+    assert len(m.colour_places(model.white)) == 0
+    assert len(m.colour_places(model.black)) == 6
+
+def test_colour_places_dont_intersect(m):
+    add_tokens(m, 'bB bB')
+    assert len(m.colour_places(model.white)) == 0
+    assert len(m.colour_places(model.black)) == 8
+
+def test_places(m):
+	add_tokens(m, 'bB ba bb wh wa wb ba')
+	assert m.places() == {model.white:m.colour_places(model.white), model.black:m.colour_places(model.black)}
+
+# MOVES
+
 def test_move_sources_empty(m):
     assert len(m.move_sources()) == 0
 
@@ -100,30 +134,6 @@ def test_move_sources_loop(m):
     add_tokens(m, '- wB', step=1)
     assert len(m.state) == 6
     assert len(m.move_sources()) == 6
-
-def test_places_empty(m):
-    assert len(m.places(model.white)) == 1
-    assert len(m.places(model.black)) == 1
-
-def test_places_single(m):
-    add_tokens(m, 'wB')
-    assert len(m.places(model.white)) == 6
-    assert len(m.places(model.black)) == 6
-
-def test_places_pair(m):
-    add_tokens(m, 'wB bB')
-    assert len(m.places(model.white)) == 3
-    assert len(m.places(model.black)) == 3
-
-def test_places_line(m):
-    add_tokens(m, 'bB wB bB')
-    assert len(m.places(model.white)) == 0
-    assert len(m.places(model.black)) == 6
-
-def test_places_dont_intersect(m):
-    add_tokens(m, 'bB bB')
-    assert len(m.places(model.white)) == 0
-    assert len(m.places(model.black)) == 8
 
 def crawl_graph_assertions(graph):
     for hex, node in graph.items():
