@@ -149,6 +149,9 @@ class Model(object):
                 hopper_moves.add(destination)
         return hopper_moves
 
+    def beetle_moves(self, hex):
+        return hexes.merge(self.crawl_moves(hex)) | self.occupied_neighbours(hex)
+
     # Get the opposite colour
     def colour_opposite(self, colour):
         return {white:black, black:white}[colour]

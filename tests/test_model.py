@@ -220,12 +220,25 @@ def test_hopper_moves_middle(m):
     add_tokens(m, 'wh ba ba ba', step=3)
     assert len(m.hopper_moves(hexes.centre)) == 2
 
+def test_hopper_spider_moves(m):
+    add_tokens(m, 'wh ba', step=3)
+    assert m.hopper_moves(hexes.centre) == m.spider_moves(hexes.centre)
+
+def test_beetle_moves_end(m):
+    add_tokens(m, 'wb ba ba ba')
+    assert len(m.beetle_moves(hexes.centre)) == 3
+
+def test_beetle_moves_middle(m):
+    add_tokens(m, 'wb ba ba ba', step=3)
+    assert len(m.beetle_moves(hexes.centre)) == 6
+
 def test_trapped_moves(m):
     add_tokens(m, 'wB wa', step=1)
     assert len(m.bee_moves(hexes.centre)) == 0
     assert len(m.spider_moves(hexes.centre)) == 0
     assert len(m.ant_moves(hexes.centre)) == 0
     assert len(m.hopper_moves(hexes.centre)) == 6
+    assert len(m.beetle_moves(hexes.centre)) == 6
 
 def test_trapped_star_moves(m):
     add_tokens(m, 'wB wa wa wa', step=2)
@@ -233,3 +246,4 @@ def test_trapped_star_moves(m):
     assert len(m.spider_moves(hexes.centre)) == 0
     assert len(m.ant_moves(hexes.centre)) == 0
     assert len(m.hopper_moves(hexes.centre)) == 3
+    assert len(m.beetle_moves(hexes.centre)) == 3
