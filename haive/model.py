@@ -152,6 +152,14 @@ class Model(object):
     def beetle_moves(self, hex):
         return hexes.merge(self.crawl_moves(hex)) | self.occupied_neighbours(hex)
 
+    move_lookup = {bee:    bee_moves,
+                   spider: spider_moves,
+                   ant:    ant_moves,
+                   hopper: hopper_moves,
+                   beetle: beetle_moves}
+    def moves(self):
+        return {source: self.move_lookup[self.state[source].kind](self,source) for source in self.move_sources()}
+
     # Get the opposite colour
     def colour_opposite(self, colour):
         return {white:black, black:white}[colour]

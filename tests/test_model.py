@@ -18,7 +18,9 @@ lookup_kind = {kind[0]: kind for kind in model.kinds}
 # The output can then be repeated in a circle around the centre
 #   with a given step between repetitions.
 # '-' can be used to specify an empty space.
-def add_tokens(m, string, step=6):
+def add_tokens(m, string, step=6, clear=True):
+    if clear:
+        m.state = {}
     tokens = string.split()
     for factor, token in enumerate(tokens):
         if token == '-':
@@ -209,7 +211,7 @@ def test_ant_moves_middle(m):
 
 def test_ant_moves_loop(m):
     add_tokens(m, '- bh', step=1)
-    add_tokens(m, '- wa')
+    add_tokens(m, '- wa', clear=False)
     assert len(m.ant_moves(hexes.offsets[0])) == 11
 
 def test_hopper_moves_end(m):
@@ -247,3 +249,57 @@ def test_trapped_star_moves(m):
     assert len(m.ant_moves(hexes.centre)) == 0
     assert len(m.hopper_moves(hexes.centre)) == 3
     assert len(m.beetle_moves(hexes.centre)) == 3
+
+def test_moves_none(m):
+    assert len(m.moves()) == 0
+
+def test_moves_one(m):
+    assert len(m.moves()) == 0
+
+def moves_helper(moves):
+    return len(moves), len(hexes.merge(moves.values()))
+
+def test_moves_pairs(m):
+    add_tokens(m, 'wB bB')
+    assert moves_helper(m.moves()) == (2,2)
+    add_tokens(m, 'wB bs')
+    assert moves_helper(m.moves()) == (2,3)
+    add_tokens(m, 'wB ba')
+    assert moves_helper(m.moves()) == (2,5)
+    add_tokens(m, 'wB bh')
+    assert moves_helper(m.moves()) == (2,3)
+    add_tokens(m, 'wB bb')
+    assert moves_helper(m.moves()) == (2,3)
+
+    add_tokens(m, 'ws bs')
+    assert moves_helper(m.moves()) == (2,2)
+    add_tokens(m, 'wa ba')
+    assert moves_helper(m.moves()) == (2,8)
+    add_tokens(m, 'wh bh')
+    assert moves_helper(m.moves()) == (2,2)
+    add_tokens(m, 'wb bb')
+    assert moves_helper(m.moves()) == (2,4)
+
+def test_moves_lines(m):
+    add_tokens(m, 'wB ba ba ba ba bB')
+    assert moves_helper(m.moves()) == (2,4)
+    add_tokens(m, 'ws ba ba ba ba bs')
+    assert moves_helper(m.moves()) == (2,2)
+    add_tokens(m, 'wa ba ba ba ba ba')
+    assert moves_helper(m.moves()) == (2,16)
+    add_tokens(m, 'wh ba ba ba ba bh')
+    assert moves_helper(m.moves()) == (2,2)
+    add_tokens(m, 'wb ba ba ba ba bb')
+    assert moves_helper(m.moves()) == (2,6)
+
+def test_moves_loops(m):
+    add_tokens(m, '- wB', step=1)
+    assert moves_helper(m.moves()) == (6,6)
+    add_tokens(m, '- ws', step=1)
+    assert moves_helper(m.moves()) == (6,6)
+    add_tokens(m, '- wa', step=1)
+    assert moves_helper(m.moves()) == (6,12)
+    add_tokens(m, '- wh', step=1)
+    assert moves_helper(m.moves()) == (6,6)
+    add_tokens(m, '- wb', step=1)
+    assert moves_helper(m.moves()) == (6,12)
