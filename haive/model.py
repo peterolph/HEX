@@ -67,6 +67,13 @@ class Model(object):
         return set(neighbour for neighbour in self.unoccupied_neighbours(hex)
             if len(self.occupied_neighbours(neighbour)) == 1)
 
+    def winner(self):
+        for colour in colours:
+            colour_bee = self.colour_hexes(colour) & self.kind_hexes(bee)
+            if len(colour_bee) > 0 and len(self.occupied_neighbours(tuple(colour_bee)[0])) == 6:
+                return self.colour_opposite(colour)
+        return None
+
     # Find the hexes that can have tokens moved out of them without splitting the hive.
     # Imagine the board as a graph and use Tarjan's algorithm to find the hexes that are NOT cut vertices.
     # https://en.wikipedia.org/wiki/Biconnected_component

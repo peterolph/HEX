@@ -103,6 +103,12 @@ def test_move(m):
 	assert len(m.state) == 2
 	assert len(m.active_hexes()) == 1
 
+def test_winner(m):
+    add_tokens(m, 'wB ba')
+    assert m.winner() is None
+    add_tokens(m, 'wB ba', step=1)
+    assert m.winner() is model.black
+
 # PLACES
 
 def test_colour_places_empty(m):
