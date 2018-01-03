@@ -139,6 +139,16 @@ class Model(object):
                     open_set.add(hex)
         return ant_moves
 
+    def hopper_moves(self, hex):
+        hopper_moves = set()
+        for offset in hexes.offsets:
+            destination = hexes.add(hex, offset)
+            if destination in self.state:
+                while destination in self.state:
+                    destination = hexes.add(destination, offset)
+                hopper_moves.add(destination)
+        return hopper_moves
+
     # Get the opposite colour
     def colour_opposite(self, colour):
         return {white:black, black:white}[colour]

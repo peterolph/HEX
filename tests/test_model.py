@@ -212,14 +212,24 @@ def test_ant_moves_loop(m):
     add_tokens(m, '- wa')
     assert len(m.ant_moves(hexes.offsets[0])) == 11
 
+def test_hopper_moves_end(m):
+    add_tokens(m, 'wh ba ba ba')
+    assert len(m.hopper_moves(hexes.centre)) == 1
+
+def test_hopper_moves_middle(m):
+    add_tokens(m, 'wh ba ba ba', step=3)
+    assert len(m.hopper_moves(hexes.centre)) == 2
+
 def test_trapped_moves(m):
     add_tokens(m, 'wB wa', step=1)
     assert len(m.bee_moves(hexes.centre)) == 0
     assert len(m.spider_moves(hexes.centre)) == 0
     assert len(m.ant_moves(hexes.centre)) == 0
+    assert len(m.hopper_moves(hexes.centre)) == 6
 
 def test_trapped_star_moves(m):
     add_tokens(m, 'wB wa wa wa', step=2)
     assert len(m.bee_moves(hexes.centre)) == 0
     assert len(m.spider_moves(hexes.centre)) == 0
     assert len(m.ant_moves(hexes.centre)) == 0
+    assert len(m.hopper_moves(hexes.centre)) == 3
