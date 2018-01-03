@@ -38,7 +38,7 @@ class Model(object):
 
     # Get the hexes on the top of the hive ie. not covered by another hex.
     def active_hexes(self):
-        return set(hex for hex in self.state.keys() if hex[2] == 0)
+        return set(hex for hex in self.state.keys() if hexes.is_active(hex))
 
     # Get the occupied hexes which neighbour this one.
     def occupied_neighbours(self, hex):
