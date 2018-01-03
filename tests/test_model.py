@@ -8,9 +8,6 @@ def m():
     m = model.Model()
     yield m
 
-lookup_colour = {colour[0]: colour for colour in model.colours}
-lookup_kind = {kind[0]: kind for kind in model.kinds}
-
 # Add a number of tokens using a simple language.
 # 'wB bb wh' generates a white bee, a black beetle and a white hopper
 #   with the white beetle at the centre of the board.
@@ -25,8 +22,8 @@ def add_tokens(m, string, step=6, clear=True):
         if token == '-':
             pass
         else:
-            colour = lookup_colour[token[0]]
-            kind = lookup_kind[token[1]]
+            colour = model.lookup_colour[token[0]]
+            kind = model.lookup_kind[token[1]]
             for offset in hexes.offsets[::factor>0 and step or 6]:
                 m.add(model.Token(colour, kind), hexes.mul(offset, factor))
 

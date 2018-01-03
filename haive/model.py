@@ -11,6 +11,7 @@ Node = namedtuple('Node', ['left', 'right'])
 white = 'white'
 black = 'black'
 colours = (white, black)
+lookup_colour = {colour[0]: colour for colour in colours}
 
 bee = 'Bee'
 hopper = 'hopper'
@@ -18,6 +19,8 @@ ant = 'ant'
 beetle = 'beetle'
 spider = 'spider'
 kinds = (bee, hopper, ant, beetle, spider)
+lookup_kind = {kind[0]: kind for kind in kinds}
+
 starting_hand = {bee: 1, hopper: 3, ant: 3, beetle:2, spider: 2}
 
 class Model(object):
