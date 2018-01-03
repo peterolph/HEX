@@ -104,8 +104,8 @@ def test_colour_places_dont_intersect(m):
     assert len(m.colour_places(model.black)) == 8
 
 def test_places(m):
-	add_tokens(m, 'bB ba bb wh wa wb ba')
-	assert m.places() == {model.white:m.colour_places(model.white), model.black:m.colour_places(model.black)}
+    add_tokens(m, 'bB ba bb wh wa wb ba')
+    assert m.places() == {model.white:m.colour_places(model.white), model.black:m.colour_places(model.black)}
 
 # MOVES
 
@@ -260,14 +260,15 @@ def test_trapped_star_moves(m):
     assert len(m.hopper_moves(hexes.centre)) == 3
     assert len(m.beetle_moves(hexes.centre)) == 3
 
+def moves_helper(moves):
+    joined = {**moves[model.black], **moves[model.white]}
+    return len(joined), len(hexes.merge(joined.values()))
+
 def test_moves_none(m):
-    assert len(m.moves()) == 0
+    assert moves_helper(m.moves()) == (0,0)
 
 def test_moves_one(m):
-    assert len(m.moves()) == 0
-
-def moves_helper(moves):
-    return len(moves), len(hexes.merge(moves.values()))
+    assert moves_helper(m.moves()) == (0,0)
 
 def test_moves_pairs(m):
     add_tokens(m, 'wB bB')

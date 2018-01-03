@@ -157,8 +157,12 @@ class Model(object):
                    ant:    ant_moves,
                    hopper: hopper_moves,
                    beetle: beetle_moves}
+
+    def colour_moves(self, colour):
+        return {source: self.move_lookup[self.state[source].kind](self,source) for source in self.move_sources() & self.colour_hexes(colour)}
+
     def moves(self):
-        return {source: self.move_lookup[self.state[source].kind](self,source) for source in self.move_sources()}
+        return {colour: self.colour_moves(colour) for colour in colours}
 
     # Get the opposite colour
     def colour_opposite(self, colour):
