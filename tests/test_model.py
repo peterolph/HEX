@@ -83,25 +83,25 @@ def test_colour_hands(m):
     assert model.ant in m.colour_hand(model.white) and model.beetle in m.colour_hand(model.white)
 
 def test_move(m):
-	assert len(m.state) == 0
-	assert len(m.active_hexes()) == 0
-	m.add(model.Token(model.white, model.bee), hexes.centre)
-	assert len(m.state) == 1
-	assert len(m.active_hexes()) == 1
-	m.add(model.Token(model.black, model.ant), hexes.offsets[0])
-	assert len(m.state) == 2
-	assert len(m.active_hexes()) == 2
-	m.add(model.Token(model.black, model.beetle), hexes.centre)
-	assert len(m.state) == 3
-	assert len(m.active_hexes()) == 2
+    assert len(m.state) == 0
+    assert len(m.active_hexes()) == 0
+    m.add(model.Token(model.white, model.bee), hexes.centre)
+    assert len(m.state) == 1
+    assert len(m.active_hexes()) == 1
+    m.add(model.Token(model.black, model.ant), hexes.offsets[0])
+    assert len(m.state) == 2
+    assert len(m.active_hexes()) == 2
+    m.add(model.Token(model.black, model.beetle), hexes.centre)
+    assert len(m.state) == 3
+    assert len(m.active_hexes()) == 2
 
-	m.remove(hexes.centre)
-	assert len(m.state) == 2
-	assert len(m.active_hexes()) == 2
+    m.remove(hexes.centre)
+    assert len(m.state) == 2
+    assert len(m.active_hexes()) == 2
 
-	m.move(hexes.offsets[0], hexes.centre)
-	assert len(m.state) == 2
-	assert len(m.active_hexes()) == 1
+    m.move(hexes.offsets[0], hexes.centre)
+    assert len(m.state) == 2
+    assert len(m.active_hexes()) == 1
 
 def test_winner(m):
     add_tokens(m, 'wB ba')
