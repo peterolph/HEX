@@ -28,8 +28,8 @@ def add_tokens(m, string, step=6, clear=True):
         else:
             colour = lookup_colour[token[0]]
             kind = lookup_kind[token[1]]
-            for offset in hexes.offsets[::step]:
-                m.state[hexes.mul(offset, factor)] = model.Token(colour, kind)
+            for offset in hexes.offsets[::factor>0 and step or 6]:
+                m.add(hexes.mul(offset, factor), model.Token(colour, kind))
 
 # BASICS
 
@@ -82,6 +82,27 @@ def test_colour_hands(m):
     add_tokens(m, 'wB wh wh wh ws ws')
     assert len(m.colour_hand(model.white)) == 2
     assert model.ant in m.colour_hand(model.white) and model.beetle in m.colour_hand(model.white)
+
+def test_move(m):
+	assert len(m.state) == 0
+	assert len(m.active_hexes()) == 0
+	m.add(hexes.centre, model.Token(model.white, model.bee))
+	assert len(m.state) == 1
+	assert len(m.active_hexes()) == 1
+	m.add(hexes.offsets[0], model.Token(model.black, model.ant))
+	assert len(m.state) == 2
+	assert len(m.active_hexes()) == 2
+	m.add(hexes.centre, model.Token(model.black, model.beetle))
+	assert len(m.state) == 3
+	assert len(m.active_hexes()) == 2
+
+	m.remove(hexes.centre)
+	assert len(m.state) == 2
+	assert len(m.active_hexes()) == 2
+
+	m.move(hexes.offsets[0], hexes.centre)
+	assert len(m.state) == 2
+	assert len(m.active_hexes()) == 1
 
 # PLACES
 

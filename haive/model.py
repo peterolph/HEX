@@ -36,6 +36,22 @@ class Model(object):
             loc, colour, kind = item.split(':')
             self.state[hexes.load(loc)] = Token(colour, kind)
 
+    def add(self, hex, token):
+        if hex in self.state:
+            self.move(hex, hexes.add(hex, hexes.down))
+        self.state[hex] = token
+
+    def remove(self, hex):
+        remove = self.state[hex]
+        del self.state[hex]
+        if hexes.add(hex, hexes.down) in self.state:
+            self.move(hexes.add(hex, hexes.down), hex)
+        return remove
+
+    def move(self, source, destination):
+        token = self.remove(source)
+        self.add(destination, token)
+
     # Get the hexes on the top of the hive ie. not covered by another hex.
     def active_hexes(self):
         return set(hex for hex in self.state.keys() if hexes.is_active(hex))

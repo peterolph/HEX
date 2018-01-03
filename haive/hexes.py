@@ -10,6 +10,9 @@ centre = (0,0,0)
 # All the distance 1 offsets around a hexagon in clockwise order starting from the top.
 offsets = ring.Ring(((0,-1,0), (1,-1,0), (1,0,0), (0,1,0), (-1,1,0), (-1,0,0)))
 
+up = (0,0,1)
+down = (0,0,-1)
+
 def add(hex1,hex2):
     return (hex1[0]+hex2[0], hex1[1]+hex2[1], hex1[2]+hex2[2])
 
