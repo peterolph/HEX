@@ -18,7 +18,7 @@ ant = 'ant'
 beetle = 'beetle'
 spider = 'spider'
 kinds = (bee, hopper, ant, beetle, spider)
-hand = (bee, hopper, hopper, hopper, ant, ant, ant, beetle, beetle, spider, spider)
+starting_hand = {bee: 1, hopper: 3, ant: 3, beetle:2, spider: 2}
 
 class Model(object):
 
@@ -198,3 +198,6 @@ class Model(object):
 
     def places(self):
         return {colour: self.colour_places(colour) for colour in colours}
+
+    def colour_hand(self, colour):
+        return [kind for kind in kinds if len(self.colour_hexes(colour) & self.kind_hexes(kind)) < starting_hand[kind]]

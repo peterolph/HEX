@@ -77,6 +77,12 @@ def test_unique_unoccupied_neighbours_curved_line(m):
     add_tokens(m, 'wB wa', step=4)
     assert(len(m.unique_unoccupied_neighbours(hexes.centre))) == 1
 
+def test_colour_hands(m):
+    assert len(m.colour_hand(model.white)) == 5
+    add_tokens(m, 'wB wh wh wh ws ws')
+    assert len(m.colour_hand(model.white)) == 2
+    assert model.ant in m.colour_hand(model.white) and model.beetle in m.colour_hand(model.white)
+
 # PLACES
 
 def test_colour_places_empty(m):
