@@ -114,6 +114,8 @@ def test_winner(m):
 def test_colour_places_empty(m):
     assert len(m.colour_places(model.white)) == 1
     assert len(m.colour_places(model.black)) == 1
+    assert list(m.colour_places(model.white))[0] == hexes.centre
+    assert list(m.colour_places(model.black))[0] == hexes.centre
 
 def test_colour_places_single(m):
     add_tokens(m, 'wB')
