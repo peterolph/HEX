@@ -300,9 +300,11 @@ def test_moves_none(m):
     assert moves_helper(m.moves()) == (0,0)
 
 def test_moves_one(m):
-    assert moves_helper(m.moves()) == (0,0)
+    add_tokens(m, 'wB')
+    assert moves_helper(m.moves()) == (1,0)
 
 def test_moves_pairs(m):
+    m.colour_bee_placed = lambda x: True
     add_tokens(m, 'wB bB')
     assert moves_helper(m.moves()) == (2,2)
     add_tokens(m, 'wB bs')
@@ -324,6 +326,7 @@ def test_moves_pairs(m):
     assert moves_helper(m.moves()) == (2,4)
 
 def test_moves_lines(m):
+    m.colour_bee_placed = lambda x: True
     add_tokens(m, 'wB ba ba ba ba bB')
     assert moves_helper(m.moves()) == (2,4)
     add_tokens(m, 'ws ba ba ba ba bs')
@@ -336,6 +339,7 @@ def test_moves_lines(m):
     assert moves_helper(m.moves()) == (2,6)
 
 def test_moves_loops(m):
+    m.colour_bee_placed = lambda x: True
     add_tokens(m, '- wB', step=1)
     assert moves_helper(m.moves()) == (6,6)
     add_tokens(m, '- ws', step=1)

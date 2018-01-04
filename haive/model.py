@@ -179,7 +179,10 @@ class Model(object):
                    beetle: beetle_moves}
 
     def colour_moves(self, colour):
-        return {source: self.move_lookup[self.state[source].kind](self,source) for source in self.move_sources() & self.colour_hexes(colour)}
+        if self.colour_bee_placed(colour):
+            return {source: self.move_lookup[self.state[source].kind](self,source) for source in self.move_sources() & self.colour_hexes(colour)}
+        else:
+            return {}
 
     def moves(self):
         return {colour: self.colour_moves(colour) for colour in colours}
@@ -199,6 +202,9 @@ class Model(object):
     # Get hexes neighbouring tokens of a given colour.
     def colour_neighbours(self, colour):
         return hexes.merge(hexes.neighbours(hex) for hex in self.colour_hexes(colour))
+
+    def colour_bee_placed(self, colour):
+        return len(self.colour_hexes(colour) & self.kind_hexes(bee)) > 0
 
     # Find the hexes that are valid for a new token of a given colour.
     # Conditions:
