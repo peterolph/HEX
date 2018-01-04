@@ -103,6 +103,13 @@ def test_move(m):
     assert len(m.state) == 2
     assert len(m.active_hexes()) == 1
 
+def test_colour_bee_placed(m):
+	assert m.colour_bee_placed(model.white) == False
+	assert m.colour_bee_placed(model.black) == False
+	add_tokens(m, 'wB')
+	assert m.colour_bee_placed(model.white) == True
+	assert m.colour_bee_placed(model.black) == False
+
 def test_winner(m):
     add_tokens(m, 'wB ba')
     assert m.winner() is None
@@ -304,6 +311,14 @@ def test_moves_none(m):
 def test_moves_one(m):
     add_tokens(m, 'wB')
     assert moves_helper(m.moves()) == (1,0)
+
+def test_moves_blocked_by_bee(m):
+    add_tokens(m, '- wa')
+    assert moves_helper(m.moves()) == (0,0)
+    add_tokens(m, 'bB wa')
+    assert moves_helper(m.moves()) == (1,2)
+    add_tokens(m, 'wB wa')
+    assert moves_helper(m.moves()) == (2,5)
 
 def test_moves_pairs(m):
     m.colour_bee_placed = lambda x: True
