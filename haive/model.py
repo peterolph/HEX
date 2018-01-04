@@ -226,4 +226,7 @@ class Model(object):
         return {colour: self.colour_places(colour) for colour in colours}
 
     def colour_hand(self, colour):
-        return [kind for kind in kinds if len(self.colour_hexes(colour) & self.kind_hexes(kind)) < starting_hand[kind]]
+        if len(self.state) >= 3 and not self.colour_bee_placed(colour):
+            return [bee]
+        else:
+            return [kind for kind in kinds if len(self.colour_hexes(colour) & self.kind_hexes(kind)) < starting_hand[kind]]

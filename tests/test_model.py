@@ -81,6 +81,9 @@ def test_colour_hands(m):
     add_tokens(m, 'wB wh wh wh ws ws')
     assert len(m.colour_hand(model.white)) == 2
     assert model.ant in m.colour_hand(model.white) and model.beetle in m.colour_hand(model.white)
+    add_tokens(m, 'wh wh wh')
+    assert len(m.colour_hand(model.white)) == 1
+    assert model.bee in m.colour_hand(model.white)
 
 def test_move(m):
     assert len(m.state) == 0
