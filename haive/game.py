@@ -27,9 +27,18 @@ class Game(object):
         self.players = players
 
     def make_move(self, move):
-        if move.token is not None:
+        if (
+            move.token is not None and
+            move.source is None and
+            move.token.colour == self.active_player and
+            move.token.kind in self.m.colour_hand(self.active_player) and
+            move.destination in self.m.colour_places(self.active_player)):
             self.m.add(move.token, move.destination)
-        elif move.source is not None:
+        elif (
+            move.token is None and
+            move.source is not None and
+            move.source in self.m.colour_hexes(self.active_player) & self.m.move_sources() and
+            move.destination in self.m.colour_moves(self.active_player)[move.source]):
             self.m.move(move.source, move.destination)
         else:
             raise ValueError
