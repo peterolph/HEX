@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 
 # An interactive wrapper for the model
 
@@ -32,15 +33,21 @@ class Game(object):
             self.m.move(move.source, move.destination)
         else:
             raise ValueError
+        print(self.active_player,'played',move)
 
     def human_move(self):
         print(self.render_model())
         while True:
             try:
-                source, destination = input("Enter a move for "+self.active_player+": ").split(" ")
+                source = input("Pick a token for "+self.active_player+": ")
                 if source in model.kinds:
+                    print(self.render_model(self.m.colour_places(self.active_player)))
+                    destination = input("Pick a location: ")
                     human_move = Move(token=model.Token(colour=self.active_player, kind=source), source=None, destination=tuple_from_string(destination))
                 else:
+                    source_hex = tuple_from_string(source)
+                    print(self.render_model(self.m.colour_moves(self.active_player)[source_hex]))
+                    destination = input("Pick a location: ")
                     human_move = Move(token=None, source=tuple_from_string(source), destination=tuple_from_string(destination))
                 break
             except (AssertionError, ValueError):
@@ -48,6 +55,7 @@ class Game(object):
         self.make_move(human_move)
 
     def ai_move(self):
+        print(self.render_model())
         self.make_move(self.ai.choose_move(self.m, self.active_player))
 
     def play(self):
@@ -61,7 +69,27 @@ class Game(object):
             self.active_player = self.m.colour_opposite(self.active_player)
         return self.m.winner()
 
-    def render_model(self):
+    def render_text(self, text, *codes, bold=False, dim=False):
+        reset_code = '0'
+        bold_code = '1'
+        dim_code = '2'
+        code_template = '\033[%sm'
+
+        codes = list(codes)
+        if bold:
+            codes.append(bold_code)
+        if dim:
+            codes.append(dim_code)
+        code_string = ';'.join(codes)
+
+        return (code_template%code_string) + text + (code_template%reset_code)
+
+    def render_token(self, token):
+        colour_codes = {model.white: '97', model.black:'30'}
+        kind_codes = {model.bee: '33', model.ant: '34', model.spider: '38;5;94', model.hopper: '32', model.beetle: '35'}
+        return self.render_text('◖', colour_codes[token.colour]) + self.render_text('◗', kind_codes[token.kind])
+
+    def render_model(self, highlight_hexes=set()):
         if len(self.m.state) > 0:
             minx = min(hex[0] for hex in self.m.state)
             maxx = max(hex[0] for hex in self.m.state)
@@ -69,7 +97,7 @@ class Game(object):
             maxy = max(hex[0]+2*hex[1] for hex in self.m.state)
         else:
             minx = maxx = miny = maxy = 0
-        padding = 1
+        padding = 2
         minx -= padding
         maxx += padding
         miny -= padding
@@ -90,9 +118,11 @@ class Game(object):
                 if (y-x)%2==0:
                     hex = (x,(y-x)/2,0)
                     if hex in self.m.state:
-                        row.append(token_to_short_string(self.m.state[hex]))
+                        row.append(self.render_token(self.m.state[hex]))
+                    elif hex in highlight_hexes:
+                        row.append(self.render_text('><', '96'))
                     else:
-                        row.append('--')
+                        row.append(self.render_text('--', dim=True))
                 else:
                     row.append('  ')
             row.append(sider[y-miny])
@@ -101,7 +131,24 @@ class Game(object):
 
         return '\n' + header + '\n' + body + '\n' + footer + '\n'
 
+    def render_test(self):
+        copy = self.m.state.copy()
+        self.m.state = {}
+        for i,colour in enumerate(model.colours):
+            for j, kind in enumerate(model.kinds):
+                self.m.add(model.Token(colour=colour, kind=kind), (j,i,0))
+        print(self.render_model(self.m.colour_moves(model.black)[(1,1,0)]))
+        self.m.state = copy
+
+import random
+class AI(object):
+    def choose_move(self, m, p):
+        places = [(model.Token(p,token),None,destination) for token in m.colour_hand(p) for destination in m.colour_places(p)]
+        moves = [(None, source, destination) for source,destinations in m.colour_moves(p).items() for destination in destinations]
+        everything = places + moves
+        return Move(*random.choice(everything))
+
 if __name__ == '__main__':
-    game = Game(model.Model(), {model.black:human, model.white:human})
+    game = Game(model.Model(), {model.black:human, model.white:ai}, ai = AI())
     winner = game.play()
     print(winner, "won!")
