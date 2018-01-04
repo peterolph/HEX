@@ -39,20 +39,20 @@ class Game(object):
         print(self.render_model())
         while True:
             try:
-                source = input("Pick a token for "+self.active_player+": ")
-                if source in model.kinds:
+                unknown_input = input("Pick a token for "+self.active_player+": ")
+                token = source = None
+                if unknown_input in model.kinds:
+                    token = model.Token(colour=self.active_player, kind=unknown_input)
                     print(self.render_model(self.m.colour_places(self.active_player)))
-                    destination = input("Pick a location: ")
-                    human_move = Move(token=model.Token(colour=self.active_player, kind=source), source=None, destination=tuple_from_string(destination))
                 else:
-                    source_hex = tuple_from_string(source)
-                    print(self.render_model(self.m.colour_moves(self.active_player)[source_hex]))
-                    destination = input("Pick a location: ")
-                    human_move = Move(token=None, source=tuple_from_string(source), destination=tuple_from_string(destination))
+                    source = tuple_from_string(unknown_input)
+                    print(self.render_model(self.m.colour_moves(self.active_player)[source]))
+
+                destination = tuple_from_string(input("Pick a location: "))
+                self.make_move(Move(token=token, source=source, destination=destination))
                 break
             except (AssertionError, ValueError):
                 print("Try again")
-        self.make_move(human_move)
 
     def ai_move(self):
         print(self.render_model())
