@@ -107,17 +107,20 @@ def test_move(m):
     assert len(m.active_hexes()) == 1
 
 def test_colour_bee_placed(m):
-	assert m.colour_bee_placed(model.white) == False
-	assert m.colour_bee_placed(model.black) == False
-	add_tokens(m, 'wB')
-	assert m.colour_bee_placed(model.white) == True
-	assert m.colour_bee_placed(model.black) == False
+    assert m.colour_bee_placed(model.white) == False
+    assert m.colour_bee_placed(model.black) == False
+    add_tokens(m, 'wB')
+    assert m.colour_bee_placed(model.white) == True
+    assert m.colour_bee_placed(model.black) == False
 
 def test_winner(m):
     add_tokens(m, 'wB ba')
     assert m.winner() is None
     add_tokens(m, 'wB ba', step=1)
     assert m.winner() is model.black
+    add_tokens(m, 'bB wa', step=1)
+    add_tokens(m, 'wb', clear=False)
+    assert m.winner() is model.white
 
 # PLACES
 

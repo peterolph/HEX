@@ -39,10 +39,23 @@ def test_rotate_to_opposite():
 def test_all_offsets():
     assert sum(hexes.offsets) == hexes.centre
 
+def test_up_down():
+    assert hexes.add(hexes.up, hexes.down) == hexes.centre
+
 def test_neighbours():
     assert hexes.neighbours(hexes.centre) == set(hexes.offsets)
     test_hex = (2,5,7)
     assert sum(hexes.neighbours(test_hex)) == hexes.mul(test_hex, 6)
+
+def test_is_active():
+    assert hexes.is_active((0,0,0)) == True
+    assert hexes.is_active((0,0,1)) == False
+    assert hexes.is_active((0,0,-1)) == False
+
+def test_make_active():
+    assert hexes.is_active(hexes.make_active((0,0,0))) == True
+    assert hexes.is_active(hexes.make_active((0,0,1))) == True
+    assert hexes.is_active(hexes.make_active((0,0,-1))) == True
 
 def test_merge():
     some_hexes = hexes.neighbours((9,2,4))

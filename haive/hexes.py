@@ -50,6 +50,9 @@ def neighbours(hex):
 def is_active(hex):
     return hex[2] == 0
 
+def make_active(hex):
+    return (hex[0], hex[1], 0)
+
 def merge(sets_of_hexes):
     return set().union(*sets_of_hexes)
 

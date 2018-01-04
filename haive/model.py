@@ -70,8 +70,10 @@ class Model(object):
     def winner(self):
         for colour in colours:
             colour_bee = self.colour_hexes(colour) & self.kind_hexes(bee)
-            if len(colour_bee) > 0 and len(self.occupied_neighbours(tuple(colour_bee)[0])) == 6:
-                return self.colour_opposite(colour)
+            if len(colour_bee) > 0:
+                active_hex = hexes.make_active(tuple(colour_bee)[0])
+                if len(self.occupied_neighbours(active_hex)) == 6:
+                    return self.colour_opposite(colour)
         return None
 
     # Find the hexes that can have tokens moved out of them without splitting the hive.
@@ -193,11 +195,11 @@ class Model(object):
 
     # Get the hexes occupied by tokens of a given colour.
     def colour_hexes(self, colour):
-        return set(hex for hex in self.active_hexes() if self.state[hex].colour == colour)
+        return set(hex for hex in self.state if self.state[hex].colour == colour)
 
     # Get the hexes occupied by tokens of a given kind.
     def kind_hexes(self, *kinds):
-        return set(hex for hex in self.active_hexes() if self.state[hex].kind in kinds)
+        return set(hex for hex in self.state if self.state[hex].kind in kinds)
 
     # Get hexes neighbouring tokens of a given colour.
     def colour_neighbours(self, colour):
@@ -226,7 +228,7 @@ class Model(object):
         return {colour: self.colour_places(colour) for colour in colours}
 
     def colour_hand(self, colour):
-        if len(self.state) >= 3 and not self.colour_bee_placed(colour):
+        if len(self.colour_hexes(colour)) >= 3 and not self.colour_bee_placed(colour):
             return [bee]
         else:
             return [kind for kind in kinds if len(self.colour_hexes(colour) & self.kind_hexes(kind)) < starting_hand[kind]]
