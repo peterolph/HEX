@@ -3,7 +3,7 @@
 # It stores the current position of tokens in play and supplies available moves for both players.
 
 from collections import namedtuple
-from haive import hexes, ring
+from insects import hexes, ring
 
 Token = namedtuple('Token', ['colour', 'kind'])
 Node = namedtuple('Node', ['left', 'right'])

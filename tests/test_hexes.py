@@ -1,6 +1,6 @@
 
 import functools
-from haive import hexes
+from insects import hexes
 
 def rotate_n_times(dir,offset,n):
     for _ in range(n):

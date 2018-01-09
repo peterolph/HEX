@@ -1,5 +1,5 @@
 
-from haive import ring
+from insects import ring
 import pytest
 
 @pytest.fixture(autouse=True)

@@ -4,7 +4,7 @@
 # A single hex is a 3-tuple, a group of hexes is a set
 # Also includes the concept of up/down to model stacks of hexes
 
-from haive import ring
+from insects import ring
 
 centre = (0,0,0)
 

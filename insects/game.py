@@ -2,7 +2,7 @@
 
 # An interactive wrapper for the model
 
-from haive import model
+from insects import model, ai
 from collections import namedtuple
 
 def tuple_from_string(string):
@@ -149,15 +149,7 @@ class Game(object):
         print(self.render_model(self.m.colour_moves(model.black)[(1,1,0)]))
         self.m.state = copy
 
-import random
-class AI(object):
-    def choose_move(self, m, p):
-        places = [(model.Token(p,token),None,destination) for token in m.colour_hand(p) for destination in m.colour_places(p)]
-        moves = [(None, source, destination) for source,destinations in m.colour_moves(p).items() for destination in destinations]
-        everything = places + moves
-        return Move(*random.choice(everything))
-
 if __name__ == '__main__':
-    game = Game(model.Model(), {model.black:human, model.white:ai}, ai = AI())
+    game = Game(model.Model(), {model.black:human, model.white:ai}, ai = ai.AI())
     winner = game.play()
     print(winner, "won!")

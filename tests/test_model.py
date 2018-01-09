@@ -1,5 +1,5 @@
 
-from haive import model, hexes
+from insects import model, hexes
 import random
 import pytest
 

@@ -1,8 +1,10 @@
-# hAIve
-A Hive clone with AI
+# Insects
 
-Run the tests with `python setup.py pytest`
+An AI player for the board game Hive.
 
-State is stored as {location: token} where location is a 3-tuple and token is a 2-tuple of colour and kind (both strings)
+It is based on Monte Carlo tree search using a model that stores game state and provides valid moves.
 
-State is stringified into the form 'x,y,z:colour:kind|x,y,z:colour:kind|<etc>'
+### Getting started
+
+1. `pip install -r requirements.txt`
+2. `python -m pytest`
