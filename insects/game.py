@@ -13,9 +13,9 @@ def tuple_from_string(string):
 def token_to_short_string(token):
     return token.colour[0] + token.kind[0]
 
-human = 'human'
-ai = 'ai'
-player_types = (human, ai)
+humanplayer = 'human'
+aiplayer = 'ai'
+player_types = (humanplayer, aiplayer)
 
 Move = namedtuple('Move', ('token','source','destination'))
 
@@ -69,9 +69,9 @@ class Game(object):
 
     def play(self):
         while self.m.winner() is None:
-            if self.players[self.active_player] == human:
+            if self.players[self.active_player] == humanplayer:
                 self.human_move()
-            elif self.players[self.active_player] == ai:
+            elif self.players[self.active_player] == aiplayer:
                 self.ai_move()
             else:
                 raise ValueError
@@ -150,6 +150,6 @@ class Game(object):
         self.m.state = copy
 
 if __name__ == '__main__':
-    game = Game(model.Model(), {model.black:human, model.white:ai}, ai = ai.AI())
+    game = Game(model.Model(), {model.black:humanplayer, model.white:aiplayer}, ai = ai.AI())
     winner = game.play()
     print(winner, "won!")
