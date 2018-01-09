@@ -2,11 +2,8 @@
 # A model of a Hive game.
 # It stores the current position of tokens in play and supplies available moves for both players.
 
-from collections import namedtuple
 from insects import hexes, ring
-
-Token = namedtuple('Token', ['colour', 'kind'])
-Node = namedtuple('Node', ['left', 'right'])
+from insects.tuples import Token, CrawlMoves
 
 white = 'white'
 black = 'black'
@@ -111,7 +108,7 @@ class Model(object):
         return set(hex for hex in cut_hexes if cut_hexes[hex] == False)
 
     def crawl_moves(self, hex):
-        crawl_moves = Node(set(), set())
+        crawl_moves = CrawlMoves(set(), set())
         occupied = self.occupied_neighbours(hex)
         unoccupied = self.unoccupied_neighbours(hex)
         for destination in unoccupied:
@@ -128,7 +125,7 @@ class Model(object):
     # The graph may have disconnected components but all nodes are on at least one cycle
     def crawl_graph(self):
         graph = {}
-        open_set = hexes.merge(node.left|node.right for node in self.all_crawl_moves().values())
+        open_set = hexes.merge(crawlmoves.left|crawlmoves.right for crawlmoves in self.all_crawl_moves().values())
         while len(open_set) > 0:
             current = open_set.pop()
             graph[current] = self.crawl_moves(current)
@@ -144,7 +141,7 @@ class Model(object):
         spider_moves = self.crawl_moves(hex)
         graph = self.crawl_graph()
         for _ in range(2):
-            spider_moves = Node(
+            spider_moves = CrawlMoves(
                 left=hexes.merge(graph[hex].left for hex in spider_moves.left),
                 right=hexes.merge(graph[hex].right for hex in spider_moves.right))
         return hexes.merge(spider_moves)

@@ -3,7 +3,7 @@
 # An interactive wrapper for the model
 
 from insects import model, ai
-from collections import namedtuple
+from insects.tuples import Move
 
 def tuple_from_string(string):
     tuple2 = tuple(int(item) for item in string.split(','))
@@ -16,8 +16,6 @@ def token_to_short_string(token):
 humanplayer = 'human'
 aiplayer = 'ai'
 player_types = (humanplayer, aiplayer)
-
-Move = namedtuple('Move', ('token','source','destination'))
 
 class Game(object):
     def __init__(self, m, players, ai=None):
