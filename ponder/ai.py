@@ -1,5 +1,5 @@
 import random
-from insects.tuples import Move, Token
+from ponder.tuples import Move, Token
 
 class AI(object):
     def choose_move(self, m, p):

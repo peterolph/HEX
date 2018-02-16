@@ -2,8 +2,8 @@
 # A model of a Hive game.
 # It stores the current position of tokens in play and supplies available moves for both players.
 
-from insects import hexes, ring
-from insects.tuples import Token, CrawlMoves
+from ponder import hexes, ring
+from ponder.tuples import Token, CrawlMoves
 
 white = 'white'
 black = 'black'

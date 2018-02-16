@@ -2,8 +2,8 @@
 
 # An interactive wrapper for the model
 
-from insects import model, ai
-from insects.tuples import Move
+from ponder import model, ai
+from ponder.tuples import Move
 
 def tuple_from_string(string):
     tuple2 = tuple(int(item) for item in string.split(','))

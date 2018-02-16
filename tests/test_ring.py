@@ -1,5 +1,5 @@
 
-from insects import ring
+from ponder import ring
 import pytest
 
 @pytest.fixture(autouse=True)

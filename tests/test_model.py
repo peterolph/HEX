@@ -1,5 +1,5 @@
 
-from insects import model, hexes
+from ponder import model, hexes
 import random
 import pytest
 
