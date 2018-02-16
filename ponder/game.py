@@ -25,7 +25,9 @@ class Game(object):
         self.players = players
 
     def make_move(self, move):
-        if (
+        if move is None:
+            pass
+        elif (
             move.token is not None and
             move.source is None and
             move.token.colour == self.active_player and
@@ -148,6 +150,6 @@ class Game(object):
         self.m.state = copy
 
 if __name__ == '__main__':
-    game = Game(model.Model(), {model.black:humanplayer, model.white:aiplayer}, ai = ai.AI())
+    game = Game(model.Model(), {model.black:aiplayer, model.white:aiplayer}, ai = ai.AI())
     winner = game.play()
     print(winner, "won!")
