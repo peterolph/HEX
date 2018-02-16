@@ -2,4 +2,4 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-sed -i -e 's/\t/    /g' `find haive tests -name '*.py'`
+sed -i -e 's/\t/    /g' `find ponder tests -name '*.py'`
