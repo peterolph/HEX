@@ -2,6 +2,8 @@
 # A model of a Hive game.
 # It stores the current position of tokens in play and supplies available moves for both players.
 
+from contextlib import contextmanager
+
 from ponder import hexes, ring
 from ponder.tuples import Token, CrawlMoves
 
@@ -41,6 +43,12 @@ class Model(object):
         if hexes.add(hex, hexes.down) in self.state:
             self.move(hexes.add(hex, hexes.down), hex)
         return remove
+
+    @contextmanager
+    def temporarily_remove(self, hex):
+        token = self.remove(hex)
+        yield
+        self.add(token, hex)
 
     def move(self, source, destination):
         token = self.remove(source)
@@ -118,22 +126,17 @@ class Model(object):
                 crawl_moves.right.add(destination)
         return crawl_moves
 
-    def all_crawl_moves(self):
-        return {hex:self.crawl_moves(hex) for hex in self.kind_hexes(bee, ant, spider, beetle)}
-
-    # Build a bidirected graph of the chain(s) of hexes that crawling tokens can reach
-    # The graph may have disconnected components but all nodes are on at least one cycle
-    def crawl_graph(self, force_starting_hex=None):
+    def crawl_graph(self, crawl_hex):
         graph = {}
-        open_set = hexes.merge(crawlmoves.left|crawlmoves.right for crawlmoves in self.all_crawl_moves().values())
-        if force_starting_hex is not None:
-            open_set.add(force_starting_hex)
-        while len(open_set) > 0:
-            current = open_set.pop()
-            graph[current] = self.crawl_moves(current)
-            for hex in graph[current].left:
-                if hex not in graph and hex not in open_set:
-                    open_set.add(hex)
+        crawl_moves = self.crawl_moves(crawl_hex)
+        open_set = crawl_moves.left|crawl_moves.right
+        with self.temporarily_remove(crawl_hex):
+            while len(open_set) > 0:
+                current = open_set.pop()
+                graph[current] = self.crawl_moves(current)
+                for hex in graph[current].left:
+                    if hex not in graph and hex not in open_set:
+                        open_set.add(hex)
         return graph
 
     def bee_moves(self, hex):
@@ -141,7 +144,7 @@ class Model(object):
 
     def spider_moves(self, hex):
         spider_moves = self.crawl_moves(hex)
-        graph = self.crawl_graph()
+        graph = self.crawl_graph(hex)
         for _ in range(2):
             spider_moves = CrawlMoves(
                 left=hexes.merge(graph[hex].left for hex in spider_moves.left),
@@ -151,9 +154,7 @@ class Model(object):
     def ant_moves(self, hex):
         ant_moves = hexes.merge(self.crawl_moves(hex))
         open_set = self.crawl_moves(hex).left
-        token = self.remove(hex)
-        graph = self.crawl_graph(force_starting_hex=hex)
-        self.add(token, hex)
+        graph = self.crawl_graph(hex)
         while len(open_set) > 0:
             current = open_set.pop()
             ant_moves.add(current)

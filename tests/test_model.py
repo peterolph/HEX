@@ -196,52 +196,37 @@ def crawl_graph_assertions(graph):
         for dest in node.left | node.right:
             assert dest in graph
 
-def crawl_graph_loop(graph, start, length):
-    lpos = rpos = start
-    for i in range(length):
-        if i != 0:
-            assert lpos != start
-            assert rpos != start
-        if length%2 == 0 and i == length / 2:
-            assert lpos == rpos
-        lpos = list(graph[lpos].left)[0]
-        rpos = list(graph[rpos].right)[0]
-    assert lpos == start
-    assert rpos == start
-
 def test_crawl_graph(m):
-    set_state(m, 'wB wa')
-    result = m.crawl_graph()
+    set_state(m, 'wa wh')
+    result = m.crawl_graph(hexes.centre)
     crawl_graph_assertions(result)
-    assert len(result) == 8
-    crawl_graph_loop(result, list(result)[0], 8)
+    assert len(result) == 6
 
 def test_crawl_graph_disconnected(m):
-    set_state(m, 'wB wa - - - - bB ba')
-    result = m.crawl_graph()
+    set_state(m, 'wa wh - - - - bh bh')
+    result = m.crawl_graph(hexes.centre)
     crawl_graph_assertions(result)
-    assert len(result) == 16
-    crawl_graph_loop(result, list(result)[0], 8)
+    assert len(result) == 6
 
 def test_crawl_graph_forked(m):
-    set_state(m, 'wB wa - bB ba')
-    result = m.crawl_graph()
+    set_state(m, 'wa wh - bh bh')
+    result = m.crawl_graph(hexes.centre)
     crawl_graph_assertions(result)
-    assert len(result) == 15
+    assert len(result) == 13
     fork_hex = hexes.mul(hexes.offsets[0],2)
     assert len(result[fork_hex].left) == 2
     assert len(result[fork_hex].right) == 2
     assert sum(1 for hex, node in result.items() if fork_hex in node.left | node.right)
 
 def test_crawl_graph_trapped(m):
-    set_state(m, 'wB wh', step=1)
-    result = m.crawl_graph()
+    set_state(m, 'wa wh', step=1)
+    result = m.crawl_graph(hexes.centre)
     crawl_graph_assertions(result)
     assert len(result) == 0
 
 def test_crawl_graph_loop(m):
-    set_state(m, '- wB', step=1)
-    result = m.crawl_graph()
+    set_state(m, '- wa', step=1)
+    result = m.crawl_graph(hexes.offsets[0])
     crawl_graph_assertions(result)
     assert len(result) == 12
     assert hexes.centre not in result
@@ -264,6 +249,12 @@ def test_spider_moves_middle(m):
     assert len(m.spider_moves(hexes.centre)) == 2
     left, right = m.spider_moves(hexes.centre)
     assert hexes.add(left, right) == hexes.centre
+
+def test_spider_moves_cup_shape(m):
+    set_state(m, '- ws', step=1)
+    m.remove(hexes.offsets[0])
+    assert len(m.spider_moves(hexes.offsets[1])) == 2
+    assert len(m.spider_moves(hexes.offsets[-1])) == 2
 
 def test_ant_moves_end(m):
     set_state(m, 'wa bh bh bh')
