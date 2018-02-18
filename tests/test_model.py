@@ -113,6 +113,19 @@ def test_move(m):
     assert len(m.state) == 2
     assert len(m.active_hexes()) == 1
 
+def test_move_climbing(m):
+    set_state(m, 'wB wb', step=3)
+    assert m.state[hexes.centre] == Token('white', 'Bee')
+    m.move(hexes.offsets[0], hexes.centre)
+    assert m.state[hexes.centre] == Token('white', 'beetle')
+    m.move(hexes.offsets[3], hexes.centre)
+    assert m.state[hexes.centre] == Token('white', 'beetle')
+    m.move(hexes.centre, hexes.offsets[0])
+    assert m.state[hexes.centre] == Token('white', 'beetle')
+    m.move(hexes.centre, hexes.offsets[3])
+    assert m.state[hexes.centre] == Token('white', 'Bee')
+    assert len(m.state) == 3
+
 def test_colour_bee_placed(m):
     assert m.colour_bee_placed(model.white) == False
     assert m.colour_bee_placed(model.black) == False

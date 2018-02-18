@@ -34,14 +34,15 @@ class Model(object):
 
     def add(self, token, hex):
         if hex in self.state:
-            self.move(hex, hexes.add(hex, hexes.down))
+            self.add(self.state[hex], hexes.add(hex, hexes.down))
         self.state[hex] = token
 
     def remove(self, hex):
         remove = self.state[hex]
-        del self.state[hex]
         if hexes.add(hex, hexes.down) in self.state:
-            self.move(hexes.add(hex, hexes.down), hex)
+            self.state[hex] = self.remove(hexes.add(hex, hexes.down))
+        else:
+            del self.state[hex]
         return remove
 
     @contextmanager
