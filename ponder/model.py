@@ -120,9 +120,11 @@ class Model(object):
         occupied = self.occupied_neighbours(hex)
         unoccupied = self.unoccupied_neighbours(hex)
         for destination in unoccupied:
-            if hexes.rotate(hexes.left, destination, hex) in occupied and hexes.rotate(hexes.right, destination, hex) in unoccupied:
+            left_occupied = hexes.rotate(hexes.left, destination, hex) in occupied
+            right_occupied = hexes.rotate(hexes.right, destination, hex) in occupied
+            if left_occupied and not right_occupied:
                 crawl_moves.left.add(destination)
-            if hexes.rotate(hexes.right, destination, hex) in occupied and hexes.rotate(hexes.left, destination, hex) in unoccupied:
+            if right_occupied and not left_occupied:
                 crawl_moves.right.add(destination)
         return crawl_moves
 
