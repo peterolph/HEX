@@ -295,6 +295,11 @@ def test_beetle_moves_middle(m):
     set_state(m, 'wb ba ba ba', step=3)
     assert len(m.beetle_moves(hexes.centre)) == 6
 
+def test_beetle_above(m):
+    set_state(m, 'wa')
+    add_token(m, 'bb')
+    assert len(m.beetle_moves(hexes.centre)) == 6
+
 def test_trapped_moves(m):
     set_state(m, 'wB wa', step=1)
     assert len(m.bee_moves(hexes.centre)) == 0

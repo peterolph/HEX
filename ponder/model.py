@@ -176,7 +176,10 @@ class Model(object):
         return hopper_moves
 
     def beetle_moves(self, hex):
-        return hexes.merge(self.crawl_moves(hex)) | self.occupied_neighbours(hex)
+        if hexes.add(hex, hexes.down) in self.state:
+            return hexes.neighbours(hex)
+        else:
+            return hexes.merge(self.crawl_moves(hex)) | self.occupied_neighbours(hex)
 
     move_lookup = {bee:    bee_moves,
                    spider: spider_moves,
