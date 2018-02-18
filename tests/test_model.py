@@ -278,6 +278,12 @@ def test_ant_moves_loop(m):
     set_state(m, '- wa')
     assert len(m.ant_moves(hexes.offsets[0])) == 11
 
+def test_ant_moves_cup_shape(m):
+    set_state(m, '- wa', step=1)
+    m.remove(hexes.offsets[0])
+    assert len(m.ant_moves(hexes.offsets[1])) == 11
+    assert len(m.ant_moves(hexes.offsets[-1])) == 11
+
 def test_hopper_moves_end(m):
     set_state(m, 'wh ba ba ba')
     assert len(m.hopper_moves(hexes.centre)) == 1

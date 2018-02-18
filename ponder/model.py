@@ -123,9 +123,11 @@ class Model(object):
 
     # Build a bidirected graph of the chain(s) of hexes that crawling tokens can reach
     # The graph may have disconnected components but all nodes are on at least one cycle
-    def crawl_graph(self):
+    def crawl_graph(self, force_starting_hex=None):
         graph = {}
         open_set = hexes.merge(crawlmoves.left|crawlmoves.right for crawlmoves in self.all_crawl_moves().values())
+        if force_starting_hex is not None:
+            open_set.add(force_starting_hex)
         while len(open_set) > 0:
             current = open_set.pop()
             graph[current] = self.crawl_moves(current)
@@ -149,7 +151,9 @@ class Model(object):
     def ant_moves(self, hex):
         ant_moves = hexes.merge(self.crawl_moves(hex))
         open_set = self.crawl_moves(hex).left
-        graph = self.crawl_graph()
+        token = self.remove(hex)
+        graph = self.crawl_graph(force_starting_hex=hex)
+        self.add(token, hex)
         while len(open_set) > 0:
             current = open_set.pop()
             ant_moves.add(current)
